@@ -9,7 +9,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\Core\WeatherApp.Application\WeatherApp.Application.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\WeatherApp.Converters\WeatherApp.Converters.csproj"/>
-        <ProjectReference Include="..\..\Infrastructure\WeatherApp.MassTransitIntegration\WeatherApp.MassTransitIntegration.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\WeatherApp.MassTransitIntegration\WeatherApp.MassTransitIntegration.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

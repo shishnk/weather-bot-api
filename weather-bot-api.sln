@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WeatherBotApi.WeatherApp", "WeatherBotApi.WeatherApp", "{143C729F-74BA-4B93-B9D7-87AFD9897919}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{04A64D44-B072-4D2A-AC2E-E0653EC5DCA4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherApp.Application", "WeatherBotApi.WeatherApp\Core\WeatherApp.Application\WeatherApp.Application.csproj", "{5AF2EE4B-181F-49EE-8664-100A5D3E6E45}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherApp.Domain", "WeatherBotApi.WeatherApp\Core\WeatherApp.Domain\WeatherApp.Domain.csproj", "{B97B3A4D-B29B-49F8-96E1-D02BFB6FEF25}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{530FDE3D-A765-421B-AC23-AF5DCAFD5007}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherApp.WebApi", "WeatherBotApi.WeatherApp\Presentation\WeatherApp.WebApi\WeatherApp.WebApi.csproj", "{4A0E8AB2-E5D0-4144-B97B-BCA0E78B1CD4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{4FC5365A-ACE4-4C9D-AA15-3C6289035694}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherApp.Converters", "WeatherBotApi.WeatherApp\Infrastructure\WeatherApp.Converters\WeatherApp.Converters.csproj", "{554D3056-100F-48C8-A2B9-823E5C40A0E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherApp.MassTransitIntegration", "WeatherBotApi.WeatherApp\Infrastructure\WeatherApp.MassTransitIntegration\WeatherApp.MassTransitIntegration.csproj", "{41CCB558-732D-4D75-86C7-7063D770CB24}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5AF2EE4B-181F-49EE-8664-100A5D3E6E45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AF2EE4B-181F-49EE-8664-100A5D3E6E45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AF2EE4B-181F-49EE-8664-100A5D3E6E45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AF2EE4B-181F-49EE-8664-100A5D3E6E45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B97B3A4D-B29B-49F8-96E1-D02BFB6FEF25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B97B3A4D-B29B-49F8-96E1-D02BFB6FEF25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B97B3A4D-B29B-49F8-96E1-D02BFB6FEF25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B97B3A4D-B29B-49F8-96E1-D02BFB6FEF25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A0E8AB2-E5D0-4144-B97B-BCA0E78B1CD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A0E8AB2-E5D0-4144-B97B-BCA0E78B1CD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A0E8AB2-E5D0-4144-B97B-BCA0E78B1CD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A0E8AB2-E5D0-4144-B97B-BCA0E78B1CD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{554D3056-100F-48C8-A2B9-823E5C40A0E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{554D3056-100F-48C8-A2B9-823E5C40A0E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{554D3056-100F-48C8-A2B9-823E5C40A0E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{554D3056-100F-48C8-A2B9-823E5C40A0E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41CCB558-732D-4D75-86C7-7063D770CB24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41CCB558-732D-4D75-86C7-7063D770CB24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41CCB558-732D-4D75-86C7-7063D770CB24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41CCB558-732D-4D75-86C7-7063D770CB24}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{04A64D44-B072-4D2A-AC2E-E0653EC5DCA4} = {143C729F-74BA-4B93-B9D7-87AFD9897919}
+		{5AF2EE4B-181F-49EE-8664-100A5D3E6E45} = {04A64D44-B072-4D2A-AC2E-E0653EC5DCA4}
+		{B97B3A4D-B29B-49F8-96E1-D02BFB6FEF25} = {04A64D44-B072-4D2A-AC2E-E0653EC5DCA4}
+		{530FDE3D-A765-421B-AC23-AF5DCAFD5007} = {143C729F-74BA-4B93-B9D7-87AFD9897919}
+		{4A0E8AB2-E5D0-4144-B97B-BCA0E78B1CD4} = {530FDE3D-A765-421B-AC23-AF5DCAFD5007}
+		{4FC5365A-ACE4-4C9D-AA15-3C6289035694} = {143C729F-74BA-4B93-B9D7-87AFD9897919}
+		{554D3056-100F-48C8-A2B9-823E5C40A0E4} = {4FC5365A-ACE4-4C9D-AA15-3C6289035694}
+		{41CCB558-732D-4D75-86C7-7063D770CB24} = {4FC5365A-ACE4-4C9D-AA15-3C6289035694}
+	EndGlobalSection
+EndGlobal

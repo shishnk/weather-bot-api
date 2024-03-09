@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Core\WeatherApp.Application\WeatherApp.Application.csproj"/>
+        <ProjectReference Include="..\..\Infrastructure\WeatherApp.Converters\WeatherApp.Converters.csproj"/>
+        <ProjectReference Include="..\..\Infrastructure\WeatherApp.MassTransitIntegration\WeatherApp.MassTransitIntegration.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MassTransit.RabbitMQ" Version="8.2.0-develop.1697"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.5.0"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.5.0"/>
+    </ItemGroup>
+
+</Project>

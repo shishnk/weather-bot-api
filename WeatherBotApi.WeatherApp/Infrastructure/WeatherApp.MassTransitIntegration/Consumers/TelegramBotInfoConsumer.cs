@@ -5,9 +5,10 @@ using WeatherApp.Domain.Models;
 
 namespace WeatherApp.MassTransitIntegration.Consumers;
 
-public class TelegramBotInfoConsumer(IWeatherService weatherService, ILogger<TelegramBotInfoConsumer> logger) : IConsumer<TelegramBotInfo>
+public class TelegramBotInfoConsumer(IWeatherService weatherService, ILogger<TelegramBotInfoConsumer> logger)
+    : IConsumer<TelegramBotWeatherRequest>
 {
-    public async Task Consume(ConsumeContext<TelegramBotInfo> context)
+    public async Task Consume(ConsumeContext<TelegramBotWeatherRequest> context)
     {
         logger.LogInformation("Received a new message from {User}", context.Message.User);
         var weatherDescriptor = await weatherService.GetWeatherForecastAsync(context.Message.Location);

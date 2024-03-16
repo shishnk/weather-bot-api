@@ -2,6 +2,7 @@ using System.Text.Json;
 using Converters.JsonConverters;
 using MassTransit;
 using WeatherApp.Application.Services;
+using WeatherApp.Domain.Models;
 using WeatherApp.MassTransitIntegration.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,9 +18,9 @@ builder.Services.AddControllers();
 builder.Services.AddSingleton(jsonSerializerOptions);
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<TelegramBotInfoConsumer>();
-    x.UsingRabbitMq((context, cfg) => cfg.ReceiveEndpoint("weather-forecast", e =>
-        e.ConfigureConsumer<TelegramBotInfoConsumer>(context)));
+    x.AddConsumer<TelegramBotInfoConsumer>()
+        .Endpoint(e => e.Name = "weather-forecast");
+    x.UsingRabbitMq((context, configurator) => configurator.ConfigureEndpoints(context));
 });
 
 var app = builder.Build();
@@ -35,7 +36,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseRouting();
 app.MapControllers();
 

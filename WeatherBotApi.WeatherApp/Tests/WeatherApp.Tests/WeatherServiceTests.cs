@@ -19,7 +19,7 @@ public class WeatherServiceTests(WeatherServiceFixture weatherServiceFixture) : 
     [InlineData("Novosibirsk")]
     [InlineData("New York")]
     [InlineData("Moscow")]
-    public async Task GetWeatherForecastAsync_WithValidLocation_ReturnsWeatherDescriptor(string location)
+    public async Task GetWeatherForecast_WithValidLocation_ReturnsOkObjectResult(string location)
     {
         // Arrange
         var controller = new WeatherController(_weatherServiceFixture, _mockLogger);
@@ -34,7 +34,7 @@ public class WeatherServiceTests(WeatherServiceFixture weatherServiceFixture) : 
     }
 
     [Fact]
-    public async Task GetWeatherForecastAsync_WithInvalidLocation_ReturnsBadRequest()
+    public async Task GetWeatherForecast_WithInvalidLocation_ReturnsBadRequest()
     {
         // Arrange
         var controller = new WeatherController(_weatherServiceFixture, _mockLogger);

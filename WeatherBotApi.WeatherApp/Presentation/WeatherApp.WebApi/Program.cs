@@ -1,9 +1,7 @@
 using System.Text.Json;
 using Converters.JsonConverters;
-using MassTransit;
 using WeatherApp.Application.Services;
-using WeatherApp.Domain.Models;
-using WeatherApp.MassTransitIntegration.Consumers;
+using WeatherApp.RabbitMqIntegration.RabbitMqConsumer;
 
 var builder = WebApplication.CreateBuilder(args);
 var jsonSerializerOptions = new JsonSerializerOptions
@@ -16,12 +14,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient<IWeatherService, WeatherService>();
 builder.Services.AddControllers();
 builder.Services.AddSingleton(jsonSerializerOptions);
-builder.Services.AddMassTransit(x =>
-{
-    x.AddConsumer<TelegramBotInfoConsumer>()
-        .Endpoint(e => e.Name = "weather-forecast");
-    x.UsingRabbitMq((context, configurator) => configurator.ConfigureEndpoints(context));
-});
+builder.Services.AddHostedService<MessageConsumer>();
 
 var app = builder.Build();
 

@@ -1,15 +1,16 @@
-﻿using MassTransit;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using WeatherApp.Domain.Models;
+using TelegramBotApp.Domain.Models;
+using TelegramBotApp.Messaging.RabbitMqProducer;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.Services.AddMassTransit(cfg => cfg.UsingRabbitMq());
+builder.Services.AddSingleton<IMessageProducer, MessageProducer>();
 
 var botClient = new TelegramBotClient("6819090366:AAEp-IrmVXY-U2Ie91lZktlkjxPG1IkJTJU");
 
@@ -21,14 +22,13 @@ ReceiverOptions receiverOptions = new()
     AllowedUpdates = Array.Empty<UpdateType>() // receive all update types except ChatMember related updates
 };
 
-var bus = Bus.Factory.CreateUsingRabbitMq();
-var client =
-    bus.CreateRequestClient<TelegramBotWeatherRequest>(new("exchange:weather-forecast"),
-        timeout: TimeSpan.FromSeconds(60));
+var provider = builder.Services.BuildServiceProvider();
+var producer = provider.GetRequiredService<IMessageProducer>();
+producer.EnsureInitialize();
 
 botClient.StartReceiving(
     updateHandler: async (botClient, update, cancellationToken) =>
-        await HandleUpdateAsync(botClient, update, client, cancellationToken),
+        await HandleUpdateAsync(botClient, update, cancellationToken),
     pollingErrorHandler: HandlePollingErrorAsync,
     receiverOptions: receiverOptions,
     cancellationToken: cts.Token
@@ -39,12 +39,12 @@ var me = await botClient.GetMeAsync();
 Console.WriteLine($"Start listening for @{me.Username}");
 
 using var host = builder.Build();
-await Task.WhenAll(bus.StartAsync(), host.RunAsync());
+
+await host.RunAsync();
 
 cts.Cancel();
 
-async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
-    IRequestClient<TelegramBotWeatherRequest> requestClient,
+async Task HandleUpdateAsync(ITelegramBotClient botClientInner, Update update,
     CancellationToken cancellationToken)
 {
     if (update.Message is not { } message)
@@ -56,21 +56,22 @@ async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
 
     Console.WriteLine($"Received a '{messageText}' message in chat {chatId}.");
 
-    var response = await requestClient.GetResponse<WeatherDescriptor>(new()
+    var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+
+    await producer.PublishMessageAsync<WeatherRequest>(new()
     {
         Location = "Novosibirsk",
         User = "Kek"
-    }, cancellationToken);
+    }, cts.Token);
 
-    Console.WriteLine(response.Message.Temperature);
-
-    await botClient.SendTextMessageAsync(
+    await botClientInner.SendTextMessageAsync(
         chatId: chatId,
-        text: $"The temperature in Novosibirsk {response.Message.Temperature} C°",
+        text: $"The temperature in Novosibirsk  C°",
         cancellationToken: cancellationToken);
 }
 
-Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+Task HandlePollingErrorAsync(ITelegramBotClient botClientInner, Exception exception,
+    CancellationToken cancellationToken)
 {
     var ErrorMessage = exception switch
     {

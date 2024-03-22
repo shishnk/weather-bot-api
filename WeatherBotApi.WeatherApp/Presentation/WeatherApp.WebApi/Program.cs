@@ -1,5 +1,7 @@
 using System.Text.Json;
 using Converters.JsonConverters;
+using DatabaseApp.Persistence.Initialization;
+using Microsoft.EntityFrameworkCore;
 using WeatherApp.Application.Services;
 using WeatherApp.RabbitMqIntegration.RabbitMqConsumer;
 
@@ -17,6 +19,13 @@ builder.Services.AddSingleton(jsonSerializerOptions);
 builder.Services.AddHostedService<MessageConsumer>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<IDatabaseContext>();
+    context.Db.Migrate();
+}
 
 if (app.Environment.IsDevelopment())
 {

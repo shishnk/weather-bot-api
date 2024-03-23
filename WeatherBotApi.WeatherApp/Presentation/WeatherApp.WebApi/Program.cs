@@ -1,6 +1,6 @@
 using System.Text.Json;
 using Converters.JsonConverters;
-using DatabaseApp.Persistence.Initialization;
+using DatabaseApp.Persistence.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
 using WeatherApp.Application.Services;
 using WeatherApp.RabbitMqIntegration.RabbitMqConsumer;

@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace DatabaseApp.Persistence.DatabaseContext;
 
-public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IDatabaseContext
+public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+    : DbContext(options), IDatabaseContext
 {
     public required DbSet<UserWeatherSubscription> UserWeatherSubscriptions { get; init; }
-    public required DbSet<WeatherDescription> WeatherDescriptions { get; init; }
     public required DbSet<User> Users { get; init; }
     public DatabaseFacade Db => Database;
 
@@ -20,10 +20,9 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfiguration(new WeatherDescriptionConfiguration());
         modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new UserWeatherSubscriptionConfiguration());
-        
+
         base.OnModelCreating(modelBuilder);
     }
 }

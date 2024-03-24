@@ -1,5 +1,6 @@
-﻿namespace DatabaseApp.Application.UserWeatherSubscriptions.Queries.GetWeatherSubscriptions;
+﻿namespace DatabaseApp.Application.UserWeatherSubscriptions;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public class UserWeatherSubscriptionDto
 {
     // ReSharper disable once UnusedAutoPropertyAccessor.Global

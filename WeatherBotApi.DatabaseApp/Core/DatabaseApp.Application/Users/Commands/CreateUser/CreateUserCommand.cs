@@ -1,10 +1,12 @@
-﻿using MediatR;
+﻿using FluentResults;
+using MediatR;
 
 namespace DatabaseApp.Application.Users.Commands.CreateUser;
 
-public class CreateUserCommand : IRequest<int>
+public class CreateUserCommand : IRequest<int>, IRequest<Result<int>>
 {
-    public required string Username { get; set; }
-    public required string MobileNumber { get; set; }
-    public DateTime RegisteredAt { get; set; }
+    public required int TelegramId { get; init; }
+    public required string Username { get; init; }
+    public required string MobileNumber { get; init; }
+    public required DateTime RegisteredAt { get; init; }
 }

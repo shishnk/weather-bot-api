@@ -11,9 +11,14 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.ToTable("USERS");
 
         builder.Property(user => user.Id).HasColumnName("ID");
-        builder.Property(user => user.Username).HasColumnName("USERNAME");
-        builder.Property(user => user.MobileNumber).HasColumnName("MOBILE_NUMBER");
+        builder.Property(user => user.TelegramId).HasColumnName("TELEGRAM_ID");
         builder.Property(user => user.RegisteredAt).HasColumnName("TIMESTAMP");
+
+        builder.OwnsOne(user => user.Metadata, metadata =>
+        {
+            metadata.Property(m => m.Username).HasColumnName("USERNAME").HasMaxLength(UserMetadata.MaxUsernameLength);
+            metadata.Property(m => m.Number).HasColumnName("MOBILE_NUMBER");
+        });
 
         builder.HasKey(user => user.Id);
         builder.Property(user => user.Id).ValueGeneratedOnAdd()

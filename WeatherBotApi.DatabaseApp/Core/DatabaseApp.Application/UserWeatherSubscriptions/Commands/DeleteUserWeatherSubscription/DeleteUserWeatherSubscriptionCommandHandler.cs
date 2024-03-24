@@ -1,27 +1,30 @@
-﻿using DatabaseApp.Application.Common.Exceptions;
+﻿using DatabaseApp.Domain.Models;
 using DatabaseApp.Domain.Repositories;
+using FluentResults;
 using MediatR;
 
 namespace DatabaseApp.Application.UserWeatherSubscriptions.Commands.DeleteUserWeatherSubscription;
 
 // ReSharper disable once UnusedType.Global
-public class DeleteUserWeatherSubscriptionCommandHandler(IUnitOfWork unitOfWork)
+public class DeleteUserWeatherSubscriptionCommandHandler(IWeatherSubscriptionRepository repository)
     : IRequest<DeleteUserWeatherSubscriptionCommand>
 {
     // ReSharper disable once UnusedMember.Global
-    public async Task Handle(DeleteUserWeatherSubscriptionCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(DeleteUserWeatherSubscriptionCommand request, CancellationToken cancellationToken)
     {
-        var weatherDescription =
-            await unitOfWork.WeatherDescriptionRepository.GetByLocationAsync(request.Location, cancellationToken);
+        var location = Location.Create(request.Location);
 
-        if (weatherDescription == null) throw new NotFoundException(nameof(weatherDescription), request.Location);
+        if (location.IsFailed) return location.ToResult();
 
         var subscription =
-            await unitOfWork.UserWeatherSubscriptionRepository.GetByIdAsync(weatherDescription.Id, cancellationToken);
+            await repository.GetByUserTelegramIdAndLocationAsync(request.UserTelegramId, location.Value,
+                cancellationToken);
 
-        if (subscription == null) throw new NotFoundException(nameof(subscription), weatherDescription.Id);
+        if (subscription == null) return Result.Fail(new Error("Subscription not found"));
 
-        unitOfWork.UserWeatherSubscriptionRepository.Delete(subscription);
-        await unitOfWork.SaveDbChangesAsync(cancellationToken);
+        repository.Delete(subscription);
+        await repository.SaveDbChangesAsync(cancellationToken);
+
+        return Result.Ok();
     }
 }

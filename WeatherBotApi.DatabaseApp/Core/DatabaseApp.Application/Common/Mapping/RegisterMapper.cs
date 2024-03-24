@@ -1,6 +1,7 @@
-﻿using DatabaseApp.Application.Users.Queries.GetUser;
+﻿using DatabaseApp.Application.Users;
+using DatabaseApp.Application.Users.Queries.GetUser;
+using DatabaseApp.Application.UserWeatherSubscriptions;
 using DatabaseApp.Application.UserWeatherSubscriptions.Queries.GetWeatherSubscriptions;
-using DatabaseApp.Application.WeatherDescriptions.Queries.GetAllWeatherDescriptions;
 using DatabaseApp.Domain.Models;
 using Mapster;
 
@@ -11,10 +12,8 @@ public class RegisterMapper : IRegister
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<UserWeatherSubscription, UserWeatherSubscriptionDto>()
-            .Map(dest => dest.Location, src => src.WeatherDescription.Location);
+            .Map(dest => dest.Location, src => src.Location.Value);
         config.NewConfig<User, UserDto>()
-            .RequireDestinationMemberSource(true);
-        config.NewConfig<WeatherDescription, WeatherDescriptionDto>()
             .RequireDestinationMemberSource(true);
     }
 }

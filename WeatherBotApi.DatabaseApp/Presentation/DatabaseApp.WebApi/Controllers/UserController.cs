@@ -32,7 +32,7 @@ public class UserController(ISender mediator) : ControllerBase
     public async Task<IActionResult> GetUser(int id) =>
         Ok(await mediator.Send(new GetUserQuery
         {
-            Id = id
+            UserTelegramId = id
         }));
 
     /// <summary>

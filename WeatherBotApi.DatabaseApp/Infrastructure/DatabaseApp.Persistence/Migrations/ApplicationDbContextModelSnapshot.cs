@@ -32,19 +32,13 @@ namespace DatabaseApp.Persistence.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
                     NpgsqlPropertyBuilderExtensions.HasIdentityOptions(b.Property<int>("Id"), 1L, null, null, null, null, null);
 
-                    b.Property<string>("MobileNumber")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("MOBILE_NUMBER");
-
                     b.Property<DateTime>("RegisteredAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("TIMESTAMP");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("USERNAME");
+                    b.Property<int>("TelegramId")
+                        .HasColumnType("integer")
+                        .HasColumnName("TELEGRAM_ID");
 
                     b.HasKey("Id");
 
@@ -69,38 +63,41 @@ namespace DatabaseApp.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("USER_ID");
 
-                    b.Property<int>("WeatherDescriptionId")
-                        .HasColumnType("integer")
-                        .HasColumnName("WEATHER_DESCRIPTION_ID");
-
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("WeatherDescriptionId");
-
                     b.ToTable("WEATHER_SUBSCRIPTIONS", (string)null);
                 });
 
-            modelBuilder.Entity("DatabaseApp.Domain.Models.WeatherDescription", b =>
+            modelBuilder.Entity("DatabaseApp.Domain.Models.User", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("ID");
+                    b.OwnsOne("DatabaseApp.Domain.Models.UserMetadata", "Metadata", b1 =>
+                        {
+                            b1.Property<int>("UserId")
+                                .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-                    NpgsqlPropertyBuilderExtensions.HasIdentityOptions(b.Property<int>("Id"), 1L, null, null, null, null, null);
+                            b1.Property<string>("Number")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("MOBILE_NUMBER");
 
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("LOCATION");
+                            b1.Property<string>("Username")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("USERNAME");
 
-                    b.HasKey("Id");
+                            b1.HasKey("UserId");
 
-                    b.ToTable("WEATHER_DESCRIPTIONS", (string)null);
+                            b1.ToTable("USERS");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.Navigation("Metadata")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("DatabaseApp.Domain.Models.UserWeatherSubscription", b =>
@@ -112,16 +109,28 @@ namespace DatabaseApp.Persistence.Migrations
                         .IsRequired()
                         .HasConstraintName("FK_USER_ID");
 
-                    b.HasOne("DatabaseApp.Domain.Models.WeatherDescription", "WeatherDescription")
-                        .WithMany()
-                        .HasForeignKey("WeatherDescriptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_WEATHER_DESCRIPTION_ID");
+                    b.OwnsOne("DatabaseApp.Domain.Models.Location", "Location", b1 =>
+                        {
+                            b1.Property<int>("UserWeatherSubscriptionId")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("LOCATION");
+
+                            b1.HasKey("UserWeatherSubscriptionId");
+
+                            b1.ToTable("WEATHER_SUBSCRIPTIONS");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserWeatherSubscriptionId");
+                        });
+
+                    b.Navigation("Location")
+                        .IsRequired();
 
                     b.Navigation("User");
-
-                    b.Navigation("WeatherDescription");
                 });
 #pragma warning restore 612, 618
         }

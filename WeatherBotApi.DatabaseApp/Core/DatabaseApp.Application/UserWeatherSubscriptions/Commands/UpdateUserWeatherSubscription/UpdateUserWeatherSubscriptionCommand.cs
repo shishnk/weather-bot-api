@@ -1,11 +1,11 @@
-﻿using DatabaseApp.Domain.Models;
+﻿using FluentResults;
 using MediatR;
 
 namespace DatabaseApp.Application.UserWeatherSubscriptions.Commands.UpdateUserWeatherSubscription;
 
-public class UpdateUserWeatherSubscriptionCommand : IRequest
+public class UpdateUserWeatherSubscriptionCommand(TimeSpan resendInterval, string location) : IRequest<Result>
 {
-    // ReSharper disable once UnusedAutoPropertyAccessor.Global
-    public required Location Location { get; set; }
-    public TimeSpan ResendInterval { get; set; }
+    public int UserTelegramId { get; init; }
+    public required string Location { get; init; } = location;
+    public TimeSpan ResendInterval { get; } = resendInterval;
 }

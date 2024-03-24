@@ -19,7 +19,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Core\DatabaseApp.Application\DatabaseApp.Application.csproj" />
-      <ProjectReference Include="..\..\Infrastructure\DatabaseApp.Converters\DatabaseApp.Converters.csproj" />
       <ProjectReference Include="..\..\Infrastructure\DatabaseApp.Persistence\DatabaseApp.Persistence.csproj" />
     </ItemGroup>
 

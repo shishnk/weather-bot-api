@@ -23,8 +23,8 @@ public class WeatherSubscriptionController(ISender mediator) : ControllerBase
     public async Task<IActionResult> CreateUserWeatherSubscription(
         [FromBody] CreateUserWeatherSubscriptionCommand command)
     {
-        var id = await mediator.Send(command);
-        return CreatedAtAction(nameof(GetWeatherSubscriptionsByUserId), new { userId = id }, null);
+        await mediator.Send(command);
+        return CreatedAtAction(nameof(GetWeatherSubscriptionsByUserId), new { userId = command.TelegramUserId }, null);
     }
 
     /// <summary>
@@ -38,7 +38,7 @@ public class WeatherSubscriptionController(ISender mediator) : ControllerBase
     public async Task<IActionResult> GetWeatherSubscriptionsByUserId(int userId) =>
         Ok(await mediator.Send(new GetUserWeatherSubscriptionsQuery
         {
-            UserId = userId
+            UserTelegramId = userId
         }));
 
     /// <summary>

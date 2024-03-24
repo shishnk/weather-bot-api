@@ -20,7 +20,6 @@ public static class DependencyInjection
                 builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
         services.AddScoped<IDatabaseContext, ApplicationDbContext>();
         services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IWeatherDescriptionRepository, WeatherDescriptionRepository>();
         services.AddScoped<IWeatherSubscriptionRepository, WeatherSubscriptionRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

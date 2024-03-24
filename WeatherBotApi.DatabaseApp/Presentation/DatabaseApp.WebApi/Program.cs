@@ -1,9 +1,10 @@
 using System.Reflection;
 using DatabaseApp.Application;
-using DatabaseApp.Converters.JsonConverters;
 using DatabaseApp.Persistence;
 using DatabaseApp.Persistence.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,9 +15,13 @@ builder.Services.AddSwaggerGen(c =>
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath);
     c.SupportNonNullableReferenceTypes();
+    c.MapType<TimeSpan>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Example = new OpenApiString("00:00:00")
+    });
 });
-builder.Services.AddControllers()
-    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new TimeSpanJsonConverter()));
+builder.Services.AddControllers();
 builder.Services.AddApplication().AddPersistence(builder.Configuration);
 
 var app = builder.Build();

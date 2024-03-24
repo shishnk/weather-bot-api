@@ -1,31 +1,34 @@
-﻿using DatabaseApp.Application.Common.Exceptions;
-using DatabaseApp.Domain.Models;
+﻿using DatabaseApp.Domain.Models;
 using DatabaseApp.Domain.Repositories;
+using FluentResults;
 using MediatR;
 
 namespace DatabaseApp.Application.UserWeatherSubscriptions.Commands.CreateUserWeatherSubscription;
 
 // ReSharper disable once UnusedType.Global
 public class CreateUserWeatherSubscriptionCommandHandler(IUnitOfWork unitOfWork)
-    : IRequestHandler<CreateUserWeatherSubscriptionCommand, int>
+    : IRequestHandler<CreateUserWeatherSubscriptionCommand, Result>
 {
-    public async Task<int> Handle(CreateUserWeatherSubscriptionCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(CreateUserWeatherSubscriptionCommand request, CancellationToken cancellationToken)
     {
-        var weatherDescription =
-            await unitOfWork.WeatherDescriptionRepository.GetByLocationAsync(request.Location, cancellationToken);
+        var location = Location.Create(request.Location);
 
-        if (weatherDescription == null) throw new NotFoundException(nameof(weatherDescription), request.Location);
+        if (location.IsFailed) return location.ToResult();
+
+        var user = await unitOfWork.UserRepository.GetByTelegramIdAsync(request.TelegramUserId, cancellationToken);
+
+        if (user == null) return Result.Fail(new Error("User not found"));
 
         var weatherSubscription = new UserWeatherSubscription
         {
-            UserId = request.UserId,
-            WeatherDescriptionId = weatherDescription.Id,
+            UserId = user.Id,
+            Location = location.Value,
             ResendInterval = request.ResendInterval
         };
 
         await unitOfWork.UserWeatherSubscriptionRepository.AddAsync(weatherSubscription, cancellationToken);
         await unitOfWork.SaveDbChangesAsync(cancellationToken);
 
-        return weatherSubscription.Id;
+        return Result.Ok();
     }
 }

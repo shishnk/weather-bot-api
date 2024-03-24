@@ -1,8 +1,10 @@
-﻿using DatabaseApp.Domain.Models;
+﻿using FluentResults;
+using MediatR;
 
 namespace DatabaseApp.Application.UserWeatherSubscriptions.Commands.DeleteUserWeatherSubscription;
 
-public class DeleteUserWeatherSubscriptionCommand
+public class DeleteUserWeatherSubscriptionCommand(int userTelegramId, string location) : IRequest<Result>
 {
-    public required Location Location { get; set; }
+    public int UserTelegramId { get; init; } = userTelegramId;
+    public required string Location { get; init; } = location;
 }

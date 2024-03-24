@@ -17,19 +17,15 @@ public class UserWeatherSubscriptionConfiguration : IEntityTypeConfiguration<Use
             .HasIdentityOptions(startValue: 1, incrementBy: 1);
 
         builder.Property(uws => uws.UserId).HasColumnName("USER_ID");
-        builder.Property(uws => uws.WeatherDescriptionId).HasColumnName("WEATHER_DESCRIPTION_ID");
         builder.Property(uws => uws.ResendInterval).HasColumnName("RESEND_INTERVAL");
+
+        builder.OwnsOne(uws => uws.Location,
+            location => location.Property(l => l.Value).HasColumnName("LOCATION"));
 
         builder
             .HasOne(uws => uws.User)
             .WithMany()
             .HasForeignKey(uws => uws.UserId)
             .OnDelete(DeleteBehavior.Cascade).HasConstraintName("FK_USER_ID");
-        builder
-            .HasOne(uws => uws.WeatherDescription)
-            .WithMany()
-            .HasForeignKey(uws => uws.WeatherDescriptionId)
-            .OnDelete(DeleteBehavior.Cascade)
-            .HasConstraintName("FK_WEATHER_DESCRIPTION_ID");
     }
 }

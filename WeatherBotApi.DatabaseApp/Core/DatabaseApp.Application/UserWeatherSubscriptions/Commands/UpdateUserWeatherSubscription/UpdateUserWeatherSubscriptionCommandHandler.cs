@@ -1,29 +1,36 @@
-﻿using DatabaseApp.Application.Common.Exceptions;
+﻿using DatabaseApp.Domain.Models;
 using DatabaseApp.Domain.Repositories;
+using FluentResults;
 using MediatR;
 
 namespace DatabaseApp.Application.UserWeatherSubscriptions.Commands.UpdateUserWeatherSubscription;
 
 // ReSharper disable once UnusedType.Global
 public class UpdateUserWeatherSubscriptionCommandHandler(IUnitOfWork unitOfWork)
-    : IRequestHandler<UpdateUserWeatherSubscriptionCommand>
+    : IRequestHandler<UpdateUserWeatherSubscriptionCommand, Result>
 {
-    public async Task Handle(UpdateUserWeatherSubscriptionCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(UpdateUserWeatherSubscriptionCommand request, CancellationToken cancellationToken)
     {
-        var weatherDescription =
-            await unitOfWork.WeatherDescriptionRepository.GetByLocationAsync(request.Location, cancellationToken);
+        var location = Location.Create(request.Location);
 
-        if (weatherDescription == null) throw new NotFoundException(nameof(weatherDescription), request.Location);
+        if (location.IsFailed) return location.ToResult();
+
+        var user = await unitOfWork.UserRepository.GetByTelegramIdAsync(request.UserTelegramId, cancellationToken);
+
+        if (user == null) return Result.Fail(new Error("User not found"));
 
         var subscription =
-            await unitOfWork.UserWeatherSubscriptionRepository.GetByIdAsync(weatherDescription.Id, cancellationToken);
+            await unitOfWork.UserWeatherSubscriptionRepository.GetByUserTelegramIdAndLocationAsync(
+                request.UserTelegramId, location.Value, cancellationToken);
 
-        if (subscription == null) throw new NotFoundException(nameof(subscription), weatherDescription.Id);
+        if (subscription == null) return Result.Fail(new Error("Subscription not found"));
 
-        weatherDescription.UpdateLocation(request.Location.Value);
+        subscription.Location = location.Value;
         subscription.ResendInterval = request.ResendInterval;
 
         unitOfWork.UserWeatherSubscriptionRepository.Update(subscription);
         await unitOfWork.SaveDbChangesAsync(cancellationToken);
+
+        return Result.Ok();
     }
 }

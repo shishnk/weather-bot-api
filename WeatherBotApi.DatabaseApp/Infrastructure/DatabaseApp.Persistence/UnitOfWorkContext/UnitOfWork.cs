@@ -6,13 +6,11 @@ namespace DatabaseApp.Persistence.UnitOfWorkContext;
 public sealed class UnitOfWork(
     IDatabaseContext context,
     IUserRepository userRepository,
-    IWeatherDescriptionRepository weatherDescriptionRepository,
     IWeatherSubscriptionRepository userWeatherSubscriptionRepository) : IUnitOfWork
 {
     private bool _disposed;
 
     public IUserRepository UserRepository => userRepository;
-    public IWeatherDescriptionRepository WeatherDescriptionRepository => weatherDescriptionRepository;
     public IWeatherSubscriptionRepository UserWeatherSubscriptionRepository => userWeatherSubscriptionRepository;
 
     ~UnitOfWork() => Dispose(false);

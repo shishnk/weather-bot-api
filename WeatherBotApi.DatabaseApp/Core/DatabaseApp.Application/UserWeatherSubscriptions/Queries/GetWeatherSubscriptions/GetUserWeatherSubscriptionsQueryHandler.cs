@@ -11,6 +11,6 @@ public class GetUserWeatherSubscriptionsQueryHandler(IUnitOfWork unitOfWork, IMa
     public async Task<List<UserWeatherSubscriptionDto>> Handle(GetUserWeatherSubscriptionsQuery request,
         CancellationToken cancellationToken) =>
         mapper.From(
-                await unitOfWork.UserWeatherSubscriptionRepository.GetAllByUserId(request.UserId, cancellationToken))
+                await unitOfWork.UserWeatherSubscriptionRepository.GetAllByUserTelegramId(request.UserTelegramId, cancellationToken))
             .AdaptToType<List<UserWeatherSubscriptionDto>>();
 }

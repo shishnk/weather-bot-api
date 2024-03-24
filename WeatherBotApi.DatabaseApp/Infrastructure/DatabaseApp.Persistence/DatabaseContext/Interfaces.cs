@@ -6,9 +6,8 @@ namespace DatabaseApp.Persistence.DatabaseContext;
 
 public interface IDatabaseContext
 {
-    DbSet<UserWeatherSubscription> UserWeatherSubscriptions { get; init; }
-    DbSet<WeatherDescription> WeatherDescriptions { get; init; }
-    DbSet<User> Users { get; init; }
+    DbSet<UserWeatherSubscription> UserWeatherSubscriptions { get; }
+    DbSet<User> Users { get; }
     DatabaseFacade Db { get; }
 
     public Task SaveDbChangesAsync(CancellationToken cancellationToken);

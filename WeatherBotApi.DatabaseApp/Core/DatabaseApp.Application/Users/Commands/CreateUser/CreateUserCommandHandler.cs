@@ -1,17 +1,23 @@
 ﻿using DatabaseApp.Domain.Models;
 using DatabaseApp.Domain.Repositories;
+using FluentResults;
 using MediatR;
 
 namespace DatabaseApp.Application.Users.Commands.CreateUser;
 
-public class CreateUserCommandHandler(IUserRepository repository) : IRequestHandler<CreateUserCommand, int>
+// ReSharper disable once UnusedType.Global
+public class CreateUserCommandHandler(IUserRepository repository) : IRequestHandler<CreateUserCommand, Result<int>>
 {
-    public async Task<int> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+    public async Task<Result<int>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
+        var userMetadata = UserMetadata.Create(request.Username, request.MobileNumber);
+
+        if (userMetadata.IsFailed) return userMetadata.ToResult();
+
         var user = new User
         {
-            Username = request.Username,
-            MobileNumber = request.MobileNumber,
+            TelegramId = request.TelegramId,
+            Metadata = userMetadata.Value,
             RegisteredAt = request.RegisteredAt
         };
 

@@ -22,15 +22,17 @@ public interface IUserRepository : IRepository
     Task AddAsync(User user, CancellationToken cancellationToken);
     void Update(User user);
     void Delete(User user);
+    Task<List<User>> GetAllAsync(CancellationToken cancellationToken);
 }
 
 public interface IWeatherDescriptionRepository : IRepository
 {
-    Task<WeatherDescription?> GetByLocationAsync(string location, CancellationToken cancellationToken);
+    Task<WeatherDescription?> GetByLocationAsync(Location location, CancellationToken cancellationToken);
     Task<WeatherDescription?> GetByIdAsync(int id, CancellationToken cancellationToken);
     Task AddAsync(WeatherDescription weatherDescription, CancellationToken cancellationToken);
     void Update(WeatherDescription weatherDescription);
     void Delete(WeatherDescription weatherDescription);
+    Task<List<WeatherDescription>> GetAllAsync(CancellationToken cancellationToken);
 }
 
 public interface IWeatherSubscriptionRepository : IRepository

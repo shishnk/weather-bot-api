@@ -14,8 +14,13 @@ public class WeatherDescriptionConfiguration : IEntityTypeConfiguration<WeatherD
         builder.Property(x => x.Location).HasColumnName("LOCATION");
 
         builder.HasKey(subscription => subscription.Id);
-        builder.Property(subscription => subscription.Id).ValueGeneratedOnAdd()
+        builder
+            .Property(subscription => subscription.Id)
+            .ValueGeneratedOnAdd()
             .HasIdentityOptions(startValue: 1, incrementBy: 1);
-        builder.Property(subscription => subscription.Location).HasMaxLength(100);
+        builder
+            .Property(subscription => subscription.Location)
+            .HasConversion(v => v.Value, v => new(v))
+            .HasMaxLength(100);
     }
 }

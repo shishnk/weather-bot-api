@@ -18,6 +18,7 @@ public class UserWeatherSubscriptionConfiguration : IEntityTypeConfiguration<Use
 
         builder.Property(uws => uws.UserId).HasColumnName("USER_ID");
         builder.Property(uws => uws.WeatherDescriptionId).HasColumnName("WEATHER_DESCRIPTION_ID");
+        builder.Property(uws => uws.ResendInterval).HasColumnName("RESEND_INTERVAL");
 
         builder
             .HasOne(uws => uws.User)

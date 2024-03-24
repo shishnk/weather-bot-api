@@ -4,9 +4,11 @@ using MediatR;
 
 namespace DatabaseApp.Application.UserWeatherSubscriptions.Commands.DeleteUserWeatherSubscription;
 
+// ReSharper disable once UnusedType.Global
 public class DeleteUserWeatherSubscriptionCommandHandler(IUnitOfWork unitOfWork)
     : IRequest<DeleteUserWeatherSubscriptionCommand>
 {
+    // ReSharper disable once UnusedMember.Global
     public async Task Handle(DeleteUserWeatherSubscriptionCommand request, CancellationToken cancellationToken)
     {
         var weatherDescription =

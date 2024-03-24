@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace DatabaseApp.Persistence.DatabaseContext;
 
-public sealed class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbContext(options), IDatabaseContext
+public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IDatabaseContext
 {
     public required DbSet<UserWeatherSubscription> UserWeatherSubscriptions { get; init; }
     public required DbSet<WeatherDescription> WeatherDescriptions { get; init; }
@@ -23,7 +23,7 @@ public sealed class DatabaseContext(DbContextOptions<DatabaseContext> options) :
         modelBuilder.ApplyConfiguration(new WeatherDescriptionConfiguration());
         modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new UserWeatherSubscriptionConfiguration());
-
+        
         base.OnModelCreating(modelBuilder);
     }
 }

@@ -1,7 +1,6 @@
+using System.Reflection;
 using System.Text.Json;
 using Converters.JsonConverters;
-using DatabaseApp.Persistence.DatabaseContext;
-using Microsoft.EntityFrameworkCore;
 using WeatherApp.Application.Services;
 using WeatherApp.RabbitMqIntegration.RabbitMqConsumer;
 
@@ -20,13 +19,6 @@ builder.Services.AddHostedService<MessageConsumer>();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var context = services.GetRequiredService<IDatabaseContext>();
-    context.Db.Migrate();
-}
-
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -38,7 +30,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseRouting();
 app.MapControllers();
 

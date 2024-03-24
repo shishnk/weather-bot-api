@@ -10,14 +10,15 @@ namespace DatabaseApp.Persistence;
 
 public static class DependencyInjection
 {
+    // ReSharper disable once UnusedMethodReturnValue.Global
     public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DbConnection");
 
-        services.AddDbContext<DatabaseContext.DatabaseContext>(options =>
+        services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(connectionString, builder =>
-                builder.MigrationsAssembly(typeof(DatabaseContext.DatabaseContext).Assembly.FullName)));
-        services.AddScoped<IDatabaseContext, DatabaseContext.DatabaseContext>();
+                builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
+        services.AddScoped<IDatabaseContext, ApplicationDbContext>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IWeatherDescriptionRepository, WeatherDescriptionRepository>();
         services.AddScoped<IWeatherSubscriptionRepository, WeatherSubscriptionRepository>();

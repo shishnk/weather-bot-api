@@ -9,16 +9,14 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        services.AddSingleton(() =>
-        {
-            var config = new TypeAdapterConfig();
-            new RegisterMapper().Register(config);
-            return config;
-        });
+        var config = new TypeAdapterConfig();
+        new RegisterMapper().Register(config);
+
+        services.AddSingleton(config);
         services.AddScoped<IMapper, ServiceMapper>();
         services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
-        
+
         return services;
     }
 }

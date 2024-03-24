@@ -8,8 +8,11 @@ namespace DatabaseApp.Persistence.Repositories;
 public class WeatherDescriptionRepository(IDatabaseContext context)
     : RepositoryBase<WeatherDescription>(context), IWeatherDescriptionRepository
 {
-    public Task<WeatherDescription?> GetByLocationAsync(string location, CancellationToken cancellationToken) =>
+    public Task<WeatherDescription?> GetByLocationAsync(Location location, CancellationToken cancellationToken) =>
         _context.WeatherDescriptions
             .Where(wd => wd.Location == location)
             .FirstOrDefaultAsync(cancellationToken);
+
+    public Task<List<WeatherDescription>> GetAllAsync(CancellationToken cancellationToken) =>
+        _context.WeatherDescriptions.ToListAsync(cancellationToken);
 }

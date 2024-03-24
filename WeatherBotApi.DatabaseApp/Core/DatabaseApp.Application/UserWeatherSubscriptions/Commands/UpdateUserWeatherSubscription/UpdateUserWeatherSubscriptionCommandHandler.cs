@@ -4,6 +4,7 @@ using MediatR;
 
 namespace DatabaseApp.Application.UserWeatherSubscriptions.Commands.UpdateUserWeatherSubscription;
 
+// ReSharper disable once UnusedType.Global
 public class UpdateUserWeatherSubscriptionCommandHandler(IUnitOfWork unitOfWork)
     : IRequestHandler<UpdateUserWeatherSubscriptionCommand>
 {
@@ -19,7 +20,7 @@ public class UpdateUserWeatherSubscriptionCommandHandler(IUnitOfWork unitOfWork)
 
         if (subscription == null) throw new NotFoundException(nameof(subscription), weatherDescription.Id);
 
-        weatherDescription.Location = request.Location;
+        weatherDescription.UpdateLocation(request.Location.Value);
         subscription.ResendInterval = request.ResendInterval;
 
         unitOfWork.UserWeatherSubscriptionRepository.Update(subscription);

@@ -61,6 +61,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseApp.Tests", "Weathe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseApp.WebApi", "WeatherBotApi.DatabaseApp\Presentation\DatabaseApp.WebApi\DatabaseApp.WebApi.csproj", "{7B4A907F-F6BD-41B1-B9D4-8BC6925CEE9D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseApp.Converters", "WeatherBotApi.DatabaseApp\Infrastructure\DatabaseApp.Converters\DatabaseApp.Converters.csproj", "{5AC0C727-6223-4CC2-B92E-17E46EBA23B5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -130,6 +132,10 @@ Global
 		{7B4A907F-F6BD-41B1-B9D4-8BC6925CEE9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B4A907F-F6BD-41B1-B9D4-8BC6925CEE9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B4A907F-F6BD-41B1-B9D4-8BC6925CEE9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AC0C727-6223-4CC2-B92E-17E46EBA23B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AC0C727-6223-4CC2-B92E-17E46EBA23B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AC0C727-6223-4CC2-B92E-17E46EBA23B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AC0C727-6223-4CC2-B92E-17E46EBA23B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{04A64D44-B072-4D2A-AC2E-E0653EC5DCA4} = {143C729F-74BA-4B93-B9D7-87AFD9897919}
@@ -158,5 +164,6 @@ Global
 		{39498A5C-79F0-4F5C-B1B6-7F90648BF340} = {07A2B9AE-A81F-482F-8016-C87CE6F0E9ED}
 		{682D1A99-FDDF-4568-BE8D-124B5D60409E} = {39498A5C-79F0-4F5C-B1B6-7F90648BF340}
 		{7B4A907F-F6BD-41B1-B9D4-8BC6925CEE9D} = {F2AB2CBF-FE29-4212-A653-39F357DD645F}
+		{5AC0C727-6223-4CC2-B92E-17E46EBA23B5} = {CC960349-7D77-4842-BBA9-6979F81C506B}
 	EndGlobalSection
 EndGlobal

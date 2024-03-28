@@ -30,15 +30,15 @@ public class WeatherSubscriptionController(ISender mediator) : ControllerBase
     /// <summary>
     /// Gets weather subscriptions by user ID.
     /// </summary>
-    /// <param name="userId">The ID of the user.</param>
+    /// <param name="userTelegramId">The ID of the user.</param>
     /// <returns>Returns 200 OK and the list of subscriptions for the user.</returns>
     /// <response code="200">Success</response>
-    [HttpGet("{userId:required:int}")]
+    [HttpGet("{userTelegramId:required:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetWeatherSubscriptionsByUserId(int userId) =>
+    public async Task<IActionResult> GetWeatherSubscriptionsByUserId(int userTelegramId) =>
         Ok(await mediator.Send(new GetUserWeatherSubscriptionsQuery
         {
-            UserTelegramId = userId
+            UserTelegramId = userTelegramId
         }));
 
     /// <summary>

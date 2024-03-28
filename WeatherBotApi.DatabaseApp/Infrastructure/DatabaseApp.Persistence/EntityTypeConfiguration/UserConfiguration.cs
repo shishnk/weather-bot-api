@@ -17,7 +17,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.OwnsOne(user => user.Metadata, metadata =>
         {
             metadata.Property(m => m.Username).HasColumnName("USERNAME").HasMaxLength(UserMetadata.MaxUsernameLength);
-            metadata.Property(m => m.Number).HasColumnName("MOBILE_NUMBER");
+            metadata.Property(m => m.MobileNumber).HasColumnName("MOBILE_NUMBER");
         });
 
         builder.HasKey(user => user.Id);

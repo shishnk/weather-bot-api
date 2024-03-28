@@ -24,6 +24,6 @@ public class CreateUserCommandHandler(IUserRepository repository) : IRequestHand
         await repository.AddAsync(user, cancellationToken);
         await repository.SaveDbChangesAsync(cancellationToken);
 
-        return user.Id;
+        return user.TelegramId;
     }
 }

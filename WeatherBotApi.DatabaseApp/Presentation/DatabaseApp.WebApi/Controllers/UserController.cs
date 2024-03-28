@@ -24,15 +24,15 @@ public class UserController(ISender mediator) : ControllerBase
     /// <summary>
     /// Gets a user by ID.
     /// </summary>
-    /// <param name="id">The ID of the user.</param>
+    /// <param name="userTelegramId">The ID of the user.</param>
     /// <returns>Returns 200 OK and the user with the specified ID.</returns>
     /// <response code="200">Success</response>
-    [HttpGet("{id:required:int}")]
+    [HttpGet("{userTelegramId:required:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetUser(int id) =>
+    public async Task<IActionResult> GetUser(int userTelegramId) =>
         Ok(await mediator.Send(new GetUserQuery
         {
-            UserTelegramId = id
+            UserTelegramId = userTelegramId
         }));
 
     /// <summary>
@@ -46,6 +46,6 @@ public class UserController(ISender mediator) : ControllerBase
     public async Task<IActionResult> CreateUser([FromBody] CreateUserCommand command)
     {
         var id = await mediator.Send(command);
-        return CreatedAtAction(nameof(GetUser), new { id }, null);
+        return CreatedAtAction(nameof(GetUser), new { userTelegramId = id.Value }, null);
     }
 }

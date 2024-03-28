@@ -20,5 +20,5 @@ public class WeatherSubscriptionRepository(IDatabaseContext context)
         _context.UserWeatherSubscriptions
             .Include(s => s.User)
             .FirstOrDefaultAsync(s =>
-                s.User.TelegramId == userTelegramId && s.Location == location, cancellationToken);
+                s.User.TelegramId == userTelegramId && s.Location.Value == location.Value, cancellationToken);
 }

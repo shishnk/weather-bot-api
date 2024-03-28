@@ -7,7 +7,7 @@ public class UserMetadata
     public const int MaxUsernameLength = 100;
     
     public required string Username { get; init; }
-    public required string Number { get; init; }
+    public required string MobileNumber { get; init; }
 
     public static Result<UserMetadata> Create(string username, string number)
     {
@@ -21,7 +21,7 @@ public class UserMetadata
         return Result.Ok(new UserMetadata
         {
             Username = username,
-            Number = number
+            MobileNumber = number
         });
     }
 

@@ -7,7 +7,7 @@ namespace DatabaseApp.Application.UserWeatherSubscriptions.Commands.DeleteUserWe
 
 // ReSharper disable once UnusedType.Global
 public class DeleteUserWeatherSubscriptionCommandHandler(IWeatherSubscriptionRepository repository)
-    : IRequest<DeleteUserWeatherSubscriptionCommand>
+    : IRequestHandler<DeleteUserWeatherSubscriptionCommand, Result>
 {
     // ReSharper disable once UnusedMember.Global
     public async Task<Result> Handle(DeleteUserWeatherSubscriptionCommand request, CancellationToken cancellationToken)

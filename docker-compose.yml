@@ -24,7 +24,15 @@ services:
     image: databaseapi
     build:
       context: .
-      dockerfile: WeatherBotApi.DatabaseApi/Presentation/DatabaseApi.WebApi/Properties/Dockerfile
+      dockerfile: WeatherBotApi.DatabaseApp/Presentation/DatabaseApp.WebApi/Properties/Dockerfile
+    ports:
+      - "5556:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DbConnection=Host=database:5432;Database=weather-database;Username=user;Password=pass
   rabbitmq:
     image: rabbitmq:3.13.0-management
     healthcheck:

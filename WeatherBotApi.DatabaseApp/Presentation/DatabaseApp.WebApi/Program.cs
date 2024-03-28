@@ -2,11 +2,15 @@ using System.Reflection;
 using DatabaseApp.Application;
 using DatabaseApp.Persistence;
 using DatabaseApp.Persistence.DatabaseContext;
+using DatabaseApp.WebApi.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -15,21 +19,28 @@ builder.Services.AddSwaggerGen(c =>
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath);
     c.SupportNonNullableReferenceTypes();
-    c.MapType<TimeSpan>(() => new OpenApiSchema
+    c.MapType<TimeSpan>(() => new()
     {
         Type = "string",
         Example = new OpenApiString("00:00:00")
     });
 });
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 builder.Services.AddControllers();
 builder.Services.AddApplication().AddPersistence(builder.Configuration);
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+try
 {
+    using var scope = app.Services.CreateScope();
     var databaseContext = scope.ServiceProvider.GetRequiredService<IDatabaseContext>();
     databaseContext.Db.Migrate();
+}
+catch (Exception e)
+{
+    Log.Fatal(e, "An error occurred while migrating the database.");
 }
 
 if (app.Environment.IsDevelopment())
@@ -44,6 +55,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseExceptionHandler();
+app.UseSerilogRequestLogging();
 app.UseRouting();
 app.MapControllers();
 

@@ -3,7 +3,7 @@ using MediatR;
 
 namespace DatabaseApp.Application.UserWeatherSubscriptions.Commands.CreateUserWeatherSubscription;
 
-public class CreateUserWeatherSubscriptionCommand : IRequest, IRequest<Result>
+public class CreateUserWeatherSubscriptionCommand : IRequest<Result>
 {
     public int TelegramUserId { get; set; }
     public required string Location { get; set; }

@@ -1,7 +1,5 @@
 ﻿using DatabaseApp.Application.Users;
-using DatabaseApp.Application.Users.Queries.GetUser;
 using DatabaseApp.Application.UserWeatherSubscriptions;
-using DatabaseApp.Application.UserWeatherSubscriptions.Queries.GetWeatherSubscriptions;
 using DatabaseApp.Domain.Models;
 using Mapster;
 
@@ -14,6 +12,9 @@ public class RegisterMapper : IRegister
         config.NewConfig<UserWeatherSubscription, UserWeatherSubscriptionDto>()
             .Map(dest => dest.Location, src => src.Location.Value);
         config.NewConfig<User, UserDto>()
-            .RequireDestinationMemberSource(true);
+            .Map(dest => dest.TelegramId, src => src.TelegramId)
+            .Map(dest => dest.MobileNumber, src => src.Metadata.MobileNumber)
+            .Map(dest => dest.Username, src => src.Metadata.Username)
+            .Map(dest => dest.RegisteredAt, src => src.RegisteredAt);
     }
 }

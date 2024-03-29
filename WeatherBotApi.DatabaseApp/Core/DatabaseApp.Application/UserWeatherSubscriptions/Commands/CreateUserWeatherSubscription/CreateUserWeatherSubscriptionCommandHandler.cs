@@ -15,6 +15,11 @@ public class CreateUserWeatherSubscriptionCommandHandler(IUnitOfWork unitOfWork)
 
         if (location.IsFailed) return location.ToResult();
 
+        var existingSubscription = await unitOfWork.UserWeatherSubscriptionRepository
+            .GetByUserTelegramIdAndLocationAsync(request.TelegramUserId, location.Value, cancellationToken);
+
+        if (existingSubscription != null) return Result.Fail(new Error("Weather subscription already exists"));
+
         var user = await unitOfWork.UserRepository.GetByTelegramIdAsync(request.TelegramUserId, cancellationToken);
 
         if (user == null) return Result.Fail(new Error("User not found"));

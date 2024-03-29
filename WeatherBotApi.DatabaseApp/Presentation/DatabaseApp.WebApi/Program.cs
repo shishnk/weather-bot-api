@@ -61,3 +61,6 @@ app.UseRouting();
 app.MapControllers();
 
 app.Run();
+
+// ReSharper disable once ClassNeverInstantiated.Global
+public partial class Program;

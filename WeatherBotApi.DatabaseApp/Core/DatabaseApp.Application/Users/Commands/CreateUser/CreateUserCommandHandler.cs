@@ -10,6 +10,13 @@ public class CreateUserCommandHandler(IUserRepository repository) : IRequestHand
 {
     public async Task<Result<int>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
+        var existingUser = await repository.GetByTelegramIdAsync(request.TelegramId, cancellationToken);
+
+        if (existingUser != null)
+        {
+            return Result.Fail<int>("User already exists");
+        }
+
         var userMetadata = UserMetadata.Create(request.Username, request.MobileNumber);
 
         if (userMetadata.IsFailed) return userMetadata.ToResult();

@@ -3,8 +3,8 @@ using MediatR;
 
 namespace DatabaseApp.Application.UserWeatherSubscriptions.Commands.DeleteUserWeatherSubscription;
 
-public class DeleteUserWeatherSubscriptionCommand(int userTelegramId, string location) : IRequest<Result>
+public class DeleteUserWeatherSubscriptionCommand : IRequest<Result>
 {
-    public int UserTelegramId { get; init; } = userTelegramId;
-    public required string Location { get; init; } = location;
+    public int UserTelegramId { get; init; }
+    public required string Location { get; init; }
 }

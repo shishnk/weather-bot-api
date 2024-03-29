@@ -5,7 +5,7 @@ namespace DatabaseApp.Domain.Models;
 public class UserMetadata
 {
     public const int MaxUsernameLength = 100;
-    
+
     public required string Username { get; init; }
     public required string MobileNumber { get; init; }
 
@@ -15,8 +15,7 @@ public class UserMetadata
             ValidateUsername(username),
             ValidateNumber(number));
 
-        if (validationResult.IsFailed)
-            return validationResult;
+        if (validationResult.IsFailed) return validationResult;
 
         return Result.Ok(new UserMetadata
         {

@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.Json;
 using Converters.JsonConverters;
 using WeatherApp.Application.Services;
@@ -29,7 +30,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseRouting();
 app.MapControllers();
 

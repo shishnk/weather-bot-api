@@ -7,9 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\WeatherBotApi.DatabaseApp\Infrastructure\DatabaseApp.Persistence\DatabaseApp.Persistence.csproj"/>
         <ProjectReference Include="..\..\Core\WeatherApp.Application\WeatherApp.Application.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\WeatherApp.Converters\WeatherApp.Converters.csproj"/>
-        <ProjectReference Include="..\..\Infrastructure\WeatherApp.RabbitMqIntegration\WeatherApp.RabbitMqIntegration.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\WeatherApp.RabbitMqIntegration\WeatherApp.RabbitMqIntegration.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

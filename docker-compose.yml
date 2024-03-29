@@ -20,6 +20,19 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
+  databaseapi:
+    image: databaseapi
+    build:
+      context: .
+      dockerfile: WeatherBotApi.DatabaseApp/Presentation/DatabaseApp.WebApi/Properties/Dockerfile
+    ports:
+      - "5556:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DbConnection=Host=database:5432;Database=weather-database;Username=user;Password=pass
   rabbitmq:
     image: rabbitmq:3.13.0-management
     healthcheck:
@@ -30,3 +43,19 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+  database:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: weather-database
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+    volumes:
+      - ~/data/postgres:/var/lib/postgresql/data/
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
+      interval: 1s
+      timeout: 5s
+      retries: 3
+    ports:
+      - "5755:5432"

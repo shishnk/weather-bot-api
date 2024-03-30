@@ -44,7 +44,7 @@ services:
       - "5672:5672"
       - "15672:15672"
   database:
-    image: postgres
+    image: postgres:latest
     restart: always
     environment:
       POSTGRES_DB: weather-database

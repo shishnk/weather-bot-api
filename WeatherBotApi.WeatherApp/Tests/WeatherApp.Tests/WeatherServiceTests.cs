@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -30,7 +31,7 @@ public class WeatherServiceTests(WeatherServiceFixture weatherServiceFixture) : 
 
         // Assert
         okResult.Should().NotBeNull();
-        okResult?.StatusCode.Should().Be(200);
+        okResult?.StatusCode.Should().Be(StatusCodes.Status200OK);
     }
 
     [Fact]
@@ -45,6 +46,6 @@ public class WeatherServiceTests(WeatherServiceFixture weatherServiceFixture) : 
 
         // Assert
         badRequestResult.Should().NotBeNull();
-        badRequestResult?.StatusCode.Should().Be(400);
+        badRequestResult?.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
     }
 }

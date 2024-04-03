@@ -37,7 +37,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBotApp.Messaging", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBotApp.Domain", "WeatherBotApi.TelegramBotApp\Core\TelegramBotApp.Domain\TelegramBotApp.Domain.csproj", "{4B8FE0E4-D1E3-40D0-90A3-3C4C25222DA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherApp.RabbitMqIntegration", "WeatherBotApi.WeatherApp\Infrastructure\WeatherApp.RabbitMqIntegration\WeatherApp.RabbitMqIntegration.csproj", "{A57C0337-6DB0-4338-9ED8-386E0914F270}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherApp.IntegrationEvents", "WeatherBotApi.WeatherApp\Infrastructure\WeatherApp.IntegrationEvents\WeatherApp.IntegrationEvents.csproj", "{A57C0337-6DB0-4338-9ED8-386E0914F270}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBotApp.Application", "WeatherBotApi.TelegramBotApp\Core\TelegramBotApp.Application\TelegramBotApp.Application.csproj", "{D1A64E09-7638-4972-A85C-8FD1683A0E37}"
 EndProject

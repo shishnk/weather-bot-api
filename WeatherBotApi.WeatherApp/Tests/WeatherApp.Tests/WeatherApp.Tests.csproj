@@ -32,8 +32,4 @@
     <ProjectReference Include="..\..\Presentation\WeatherApp.WebApi\WeatherApp.WebApi.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Presentation\WeatherApp.WebApi\WeatherApp.WebApi.csproj" />
-  </ItemGroup>
-
 </Project>

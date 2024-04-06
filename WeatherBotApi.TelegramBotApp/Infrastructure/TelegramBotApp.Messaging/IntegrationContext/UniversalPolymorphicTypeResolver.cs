@@ -4,15 +4,13 @@ using System.Text.Json.Serialization.Metadata;
 
 namespace TelegramBotApp.Messaging.IntegrationContext;
 
-public class PolymorphicIntegrationEventTypeResolver : DefaultJsonTypeInfoResolver
+public class UniversalPolymorphicTypeResolver(Type baseType) : DefaultJsonTypeInfoResolver
 {
     public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)
     {
         var jsonTypeInfo = base.GetTypeInfo(type, options);
 
-        var basePointType = typeof(IntegrationEvent);
-
-        if (jsonTypeInfo.Type != basePointType) return jsonTypeInfo;
+        if (jsonTypeInfo.Type != baseType) return jsonTypeInfo;
 
         var derivedTypes = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(s => s.GetTypes())
@@ -21,7 +19,7 @@ public class PolymorphicIntegrationEventTypeResolver : DefaultJsonTypeInfoResolv
 
         jsonTypeInfo.PolymorphismOptions = new()
         {
-            TypeDiscriminatorPropertyName = "$integration-event-type",
+            TypeDiscriminatorPropertyName = $"{baseType.Name.ToLower()}-type",
             IgnoreUnrecognizedTypeDiscriminators = true,
             UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization
         };

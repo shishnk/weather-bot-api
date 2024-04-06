@@ -1,11 +1,11 @@
-using TelegramBotApp.Domain.Models;
+using TelegramBotApp.Domain.Responses;
 
 namespace TelegramBotApp.Messaging.IntegrationContext;
 
 public interface IIntegrationEventHandler<in TIntegrationEvent> : IIntegrationEventHandler
-    where TIntegrationEvent : IntegrationEvent
+    where TIntegrationEvent : IntegrationEventBase
 {
-    Task<IResponseMessage?> Handle(TIntegrationEvent @event);
+    Task<UniversalResponse?> Handle(TIntegrationEvent @event);
 }
 
 public interface IIntegrationEventHandler;

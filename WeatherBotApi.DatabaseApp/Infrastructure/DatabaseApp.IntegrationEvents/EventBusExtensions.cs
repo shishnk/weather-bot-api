@@ -1,10 +1,10 @@
+using DatabaseApp.IntegrationEvents.IntegrationEventHandlers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using TelegramBotApp.Messaging;
-using TelegramBotApp.Messaging.IntegrationContext.WeatherForecastIntegrationEvents;
-using WeatherApp.IntegrationEvents.IntegrationEventHandlers;
+using TelegramBotApp.Messaging.IntegrationContext.UserIntegrationEvents;
 
-namespace WeatherApp.IntegrationEvents;
+namespace DatabaseApp.IntegrationEvents;
 
 public static class EventBusExtensions
 {
@@ -12,8 +12,8 @@ public static class EventBusExtensions
     public static IApplicationBuilder SubscribeToEvents(this IApplicationBuilder app)
     {
         var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
-
-        eventBus.Subscribe<WeatherForecastRequestIntegrationEvent, WeatherForecastRequestIntegrationEventHandler>();
+        
+        eventBus.Subscribe<GetAllUsersRequestIntegrationEvent, GetAllUsersRequestIntegrationEventHandler>();
 
         return app;
     }

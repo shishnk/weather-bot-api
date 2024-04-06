@@ -1,4 +1,5 @@
 using System.Text.Json;
+using TelegramBotApp.Domain.Responses;
 using TelegramBotApp.Messaging.IntegrationContext;
 
 namespace TelegramBotApp.Messaging.Settings;
@@ -12,6 +13,10 @@ public class JsonOptions : IJsonOptions
 {
     public JsonSerializerOptions Options { get; } = new()
     {
-        TypeInfoResolver = new PolymorphicIntegrationEventTypeResolver()
+        TypeInfoResolverChain =
+        {
+            new UniversalPolymorphicTypeResolver(typeof(IntegrationEventBase)),
+            // new UniversalPolymorphicTypeResolver(typeof(IResponseMessage))
+        }
     };
 }

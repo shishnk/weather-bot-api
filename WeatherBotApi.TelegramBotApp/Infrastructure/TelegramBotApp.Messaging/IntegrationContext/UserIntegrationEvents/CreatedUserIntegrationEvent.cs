@@ -1,8 +1,8 @@
 namespace TelegramBotApp.Messaging.IntegrationContext.UserIntegrationEvents;
 
-public class CreatedUserIntegrationEvent : IntegrationEvent
+public class CreatedUserIntegrationEventBase : IntegrationEventBase
 {
-    public override string Name => nameof(CreatedUserIntegrationEvent);
+    public override string Name => nameof(CreatedUserIntegrationEventBase);
     
     public int UserTelegramId { get; init; }
     public required string Username { get; init; }

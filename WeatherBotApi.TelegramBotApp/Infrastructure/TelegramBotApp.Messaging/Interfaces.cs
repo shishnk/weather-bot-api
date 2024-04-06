@@ -1,32 +1,27 @@
 ﻿using RabbitMQ.Client;
-using TelegramBotApp.Domain.Models;
+using TelegramBotApp.Domain.Responses;
 using TelegramBotApp.Messaging.EventBusContext;
 using TelegramBotApp.Messaging.IntegrationContext;
 
 namespace TelegramBotApp.Messaging;
 
-public interface IMessageProducer : IDisposable
+public interface IMessageFormatter<in T> where T : class
 {
-    bool IsInitialized { get; }
-
-    void EnsureInitialize(); // in 7.0 version RabbitMQ has async methods (but not all features are supported)
-    Task<IResponseMessage> PublishMessageAsync<TRequest>(TRequest message, CancellationToken cancellationToken);
+    // ReSharper disable once UnusedMemberInSuper.Global
+    public string Format(T value);
 }
 
 public interface IEventBus
 {
-    bool IsInitialized { get; }
-
-    void EnsureInitialize();
-
-    Task<IResponseMessage?> Publish(IntegrationEvent @event, string? replyTo = null,
+    Task<UniversalResponse?> Publish(IntegrationEventBase eventBase, string? replyTo = null,
         CancellationToken cancellationToken = default);
 
     void Subscribe<T, TH>()
-        where T : IntegrationEvent
+        where T : IntegrationEventBase
         where TH : IIntegrationEventHandler<T>;
-
-    void SubscribeOnResponse<T>() where T : IResponseMessage;
+    
+    // TODO: create classes with generic parameter (where parameter is response type) 
+    void SubscribeToResponse(string replyName);
 }
 
 public interface IPersistentConnection : IDisposable
@@ -40,7 +35,7 @@ public interface IPersistentConnection : IDisposable
 public interface IEventBusSubscriptionsManager
 {
     void AddSubscription<T, TH>()
-        where T : IntegrationEvent
+        where T : IntegrationEventBase
         where TH : IIntegrationEventHandler<T>;
 
     bool HasSubscriptionsForEvent(string eventName);

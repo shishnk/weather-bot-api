@@ -7,7 +7,7 @@ using Polly;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
-using TelegramBotApp.Domain.Models;
+using TelegramBotApp.Domain.Responses;
 using TelegramBotApp.Messaging.IntegrationContext;
 using TelegramBotApp.Messaging.Settings;
 
@@ -28,7 +28,7 @@ public class EventBus(
     private const string ResponseQueue = "response-queue";
 
     private IModel _channel = null!;
-    private readonly ConcurrentDictionary<string, TaskCompletionSource<IResponseMessage?>> _callbackMapper = new();
+    private readonly ConcurrentDictionary<string, TaskCompletionSource<UniversalResponse?>> _callbackMapper = new();
 
     public bool IsInitialized { get; private set; }
 
@@ -52,20 +52,20 @@ public class EventBus(
             queue: EventQueue,
             durable: true,
             exclusive: false,
-            autoDelete: false,
+            autoDelete: true,
             arguments: null);
         _channel.QueueDeclare(
             queue: ResponseQueue,
             durable: true,
             exclusive: false,
-            autoDelete: false,
+            autoDelete: true,
             arguments: null);
         _channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
 
         IsInitialized = true;
     }
 
-    public Task<IResponseMessage?> Publish(IntegrationEvent @event, string? replyTo = null,
+    public Task<UniversalResponse?> Publish(IntegrationEventBase eventBase, string? replyTo = null,
         CancellationToken cancellationToken = default)
     {
         if (!IsInitialized) EnsureInitialize();
@@ -75,35 +75,36 @@ public class EventBus(
             .WaitAndRetry(retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
                 (ex, time) => logger.LogWarning(ex,
                     "Could not publish event: {EventName} after {Timeout}s ({ExceptionMessage})",
-                    @event.Name, $"{time.TotalSeconds:n1}", ex.Message));
+                    eventBase.Name, $"{time.TotalSeconds:n1}", ex.Message));
 
-        var body = JsonSerializer.SerializeToUtf8Bytes(@event, jsonOptions.Options);
-        var tcs = new TaskCompletionSource<IResponseMessage?>();
+        var body = JsonSerializer.SerializeToUtf8Bytes(eventBase, jsonOptions.Options);
+        var tcs = new TaskCompletionSource<UniversalResponse?>();
+        var properties = _channel.CreateBasicProperties();
+        properties.CorrelationId = eventBase.Id.ToString();
+        properties.ReplyTo = replyTo;
+        _callbackMapper.TryAdd(properties.CorrelationId, tcs);
+
+        cancellationToken.Register(() =>
+        {
+            _callbackMapper.TryRemove(properties.CorrelationId, out _);
+            tcs.TrySetResult(new("Bad request and was canceled"));
+        });
 
         policy.Execute(() =>
         {
-            var properties = _channel.CreateBasicProperties();
-            properties.CorrelationId = @event.Id.ToString();
-            properties.ReplyTo = replyTo;
-
-            _callbackMapper.TryAdd(properties.CorrelationId, tcs);
-
-            logger.LogInformation("Publishing event to RabbitMQ: {EventName}", @event.Name);
-
+            logger.LogInformation("Publishing event to RabbitMQ: {EventName}", eventBase.Name);
             _channel.BasicPublish(
                 exchange: DirectEventExchange,
-                routingKey: @event.Name,
+                routingKey: eventBase.Name,
                 basicProperties: properties,
                 body: body);
-
-            cancellationToken.Register(() => _callbackMapper.TryRemove(properties.CorrelationId, out _));
         });
 
         return tcs.Task;
     }
 
     public void Subscribe<T, TH>()
-        where T : IntegrationEvent where TH : IIntegrationEventHandler<T>
+        where T : IntegrationEventBase where TH : IIntegrationEventHandler<T>
     {
         if (!IsInitialized) EnsureInitialize();
 
@@ -123,34 +124,35 @@ public class EventBus(
         StartConsume();
     }
 
-    public void SubscribeOnResponse<T>() where T : IResponseMessage
+    public void SubscribeToResponse(string replyName)
     {
         if (!IsInitialized) EnsureInitialize();
 
         _channel.QueueBind(queue: ResponseQueue,
             exchange: DirectResponseExchange,
-            routingKey: typeof(T).Name);
+            routingKey: replyName);
 
         var responseConsumer = new AsyncEventingBasicConsumer(_channel);
 
         responseConsumer.Received += (_, ea) =>
         {
-            if (!_callbackMapper.TryRemove(ea.BasicProperties.CorrelationId ??
-                                           throw new ArgumentNullException(nameof(ea.BasicProperties.CorrelationId)),
-                    out var tcs)) return Task.CompletedTask;
-
-            var message = JsonSerializer.Serialize(Encoding.UTF8.GetString(ea.Body.Span));
-            // var result = JsonSerializer.Deserialize<IResponseMessage>(message);
-
-            tcs.TrySetResult(new Kek
+            if (!_callbackMapper.TryRemove(ea.BasicProperties.CorrelationId,
+                    out var tcs))
             {
-                Value = "kek"
-            });
+                logger.LogWarning("Could not find callback for correlation id: {CorrelationId}",
+                    ea.BasicProperties.CorrelationId);
+                return Task.CompletedTask;
+            }
+
+            var result = JsonSerializer.Deserialize<UniversalResponse>(Encoding.UTF8.GetString(ea.Body.Span),
+                jsonOptions.Options);
+
+            tcs.SetResult(result);
 
             return Task.CompletedTask;
         };
 
-        logger.LogInformation("Subscribing to response {ResponseName}", typeof(T).Name);
+        logger.LogInformation("Subscribing to response {ResponseName}", replyName);
 
         _channel.BasicConsume(queue: ResponseQueue, autoAck: true, consumer: responseConsumer);
     }
@@ -180,12 +182,13 @@ public class EventBus(
                         continue;
                     }
 
-                    var integrationEvent = JsonSerializer.Deserialize<IntegrationEvent>(message, jsonOptions.Options);
+                    var integrationEvent =
+                        JsonSerializer.Deserialize<IntegrationEventBase>(message, jsonOptions.Options);
                     integrationEvent?.UpdateId(Guid.Parse(ea.BasicProperties.CorrelationId));
                     var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
 
                     var task = concreteType.GetMethod("Handle")
-                                   ?.Invoke(handler, [integrationEvent]) as Task<IResponseMessage?> ??
+                                   ?.Invoke(handler, [integrationEvent]) as Task<UniversalResponse?> ??
                                throw new InvalidCastException();
                     var response = await task;
 

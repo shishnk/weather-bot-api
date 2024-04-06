@@ -8,7 +8,7 @@ public class EventBusSubscriptionManager : IEventBusSubscriptionsManager
     private readonly List<Type> _eventTypes = [];
 
     public void AddSubscription<T, TH>()
-        where T : IntegrationEvent
+        where T : IntegrationEventBase
         where TH : IIntegrationEventHandler<T>
     {
         var eventName = GetEventKey<T>();

@@ -1,20 +1,17 @@
-using TelegramBotApp.Domain.Models;
+using TelegramBotApp.Domain.Responses;
 using TelegramBotApp.Messaging.IntegrationContext;
 using TelegramBotApp.Messaging.IntegrationContext.WeatherForecastIntegrationEvents;
+using WeatherApp.Application.MessageFormatters;
 using WeatherApp.Application.Services;
 
 namespace WeatherApp.IntegrationEvents.IntegrationEventHandlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class RequestWeatherForecastIntegrationEventHandler(IWeatherService weatherService)
-    : IIntegrationEventHandler<RequestWeatherForecastIntegrationEvent>
+public class WeatherForecastRequestIntegrationEventHandler(IWeatherService weatherService)
+    : IIntegrationEventHandler<WeatherForecastRequestIntegrationEvent>
 {
-    public async Task<IResponseMessage?> Handle(RequestWeatherForecastIntegrationEvent @event)
-    {
-        var weatherForecast = await weatherService.GetWeatherForecastAsync(@event.Location);
-        return new Kek
-        {
-            Value = weatherForecast.FeelTemperature.ToString()
-        };
-    }
+    private readonly WeatherDescriptorFormatter _messageFormatter = new();
+
+    public async Task<UniversalResponse?> Handle(WeatherForecastRequestIntegrationEvent eventBase) =>
+        new(_messageFormatter.Format(await weatherService.GetWeatherForecastAsync(eventBase.Location)));
 }

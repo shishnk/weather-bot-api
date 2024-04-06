@@ -1,8 +1,8 @@
-using System.Reflection;
 using System.Text.Json;
 using Converters.JsonConverters;
+using TelegramBotApp.Messaging;
 using WeatherApp.Application.Services;
-using WeatherApp.RabbitMqIntegration.RabbitMqConsumer;
+using WeatherApp.IntegrationEvents;
 
 var builder = WebApplication.CreateBuilder(args);
 var jsonSerializerOptions = new JsonSerializerOptions
@@ -15,7 +15,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient<IWeatherService, WeatherService>();
 builder.Services.AddControllers();
 builder.Services.AddSingleton(jsonSerializerOptions);
-builder.Services.AddHostedService<MessageConsumer>();
+builder.Services.AddMessaging(builder.Configuration);
 
 var app = builder.Build();
 
@@ -30,6 +30,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.SubscribeToEvents();
 app.UseHttpsRedirection();
 app.UseRouting();
 app.MapControllers();

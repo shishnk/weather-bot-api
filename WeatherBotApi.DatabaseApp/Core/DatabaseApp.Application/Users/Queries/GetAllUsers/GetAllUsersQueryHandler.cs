@@ -1,5 +1,4 @@
-﻿using DatabaseApp.Application.Users.Queries.GetUser;
-using DatabaseApp.Domain.Repositories;
+﻿using DatabaseApp.Domain.Repositories;
 using MapsterMapper;
 using MediatR;
 

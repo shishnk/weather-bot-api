@@ -10,7 +10,7 @@ COPY WeatherBotApi.DatabaseApp/Tests/DatabaseApp.Tests/*.csproj ./WeatherBotApi.
 COPY WeatherBotApi.WeatherApp/Core/WeatherApp.Application/*.csproj ./WeatherBotApi.WeatherApp/Core/WeatherApp.Application/
 COPY WeatherBotApi.WeatherApp/Core/WeatherApp.Domain/*.csproj ./WeatherBotApi.WeatherApp/Core/WeatherApp.Domain/
 COPY WeatherBotApi.WeatherApp/Infrastructure/WeatherApp.Converters/*.csproj WeatherBotApi.WeatherApp/Infrastructure/WeatherApp.Converters/
-COPY WeatherBotApi.WeatherApp/Infrastructure/WeatherApp.RabbitMqIntegration/*.csproj ./WeatherBotApi.WeatherApp/Infrastructure/WeatherApp.RabbitMqIntegration/
+COPY WeatherBotApi.WeatherApp/Infrastructure/WeatherApp.IntegrationEvents/*.csproj ./WeatherBotApi.WeatherApp/Infrastructure/WeatherApp.IntegrationEvents/
 COPY WeatherBotApi.WeatherApp/Presentation/WeatherApp.WebApi/*.csproj ./WeatherBotApi.WeatherApp/Presentation/WeatherApp.WebApi/ 
 COPY WeatherBotApi.WeatherApp/Tests/WeatherApp.Tests/*.csproj ./WeatherBotApi.WeatherApp/Tests/WeatherApp.Tests/
 COPY WeatherBotApi.TelegramBotApp/Core/TelegramBotApp.Domain/*.csproj ./WeatherBotApi.TelegramBotApp/Core/TelegramBotApp.Domain/

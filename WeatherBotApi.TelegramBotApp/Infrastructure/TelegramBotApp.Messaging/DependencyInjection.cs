@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TelegramBotApp.Messaging.Connection;
 using TelegramBotApp.Messaging.EventBusContext;
 using TelegramBotApp.Messaging.IntegrationContext;
+using TelegramBotApp.Messaging.IntegrationResponseContext.IntegrationResponseHandlers;
 using TelegramBotApp.Messaging.Settings;
 
 namespace TelegramBotApp.Messaging;
@@ -23,6 +24,18 @@ public static class DependencyInjection
         services.AddSingleton<IJsonOptions, JsonOptions>();
 
         var interfaceType = typeof(IIntegrationEventHandler);
+        foreach (var type in
+                 AppDomain.CurrentDomain.GetAssemblies()
+                     .SelectMany(s => s.GetTypes())
+                     .Where(p => interfaceType.IsAssignableFrom(p) && p.IsClass)) services.AddTransient(type);
+
+        return services;
+    }
+
+    // ReSharper disable once UnusedMethodReturnValue.Global
+    public static IServiceCollection AddResponseHandlers(this IServiceCollection services)
+    {
+        var interfaceType = typeof(IResponseHandler);
         foreach (var type in
                  AppDomain.CurrentDomain.GetAssemblies()
                      .SelectMany(s => s.GetTypes())

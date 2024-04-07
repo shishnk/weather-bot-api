@@ -14,6 +14,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Infrastructure\TelegramBotApp.Messaging\TelegramBotApp.Messaging.csproj" />
+      <ProjectReference Include="..\TelegramBotApp.Domain\TelegramBotApp.Domain.csproj" />
     </ItemGroup>
 
 </Project>

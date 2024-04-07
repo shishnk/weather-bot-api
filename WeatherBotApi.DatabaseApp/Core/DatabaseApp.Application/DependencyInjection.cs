@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using DatabaseApp.Application.Common.Behaviors;
 using DatabaseApp.Application.Common.Mapping;
+using DatabaseApp.Application.Users.Queries.GetAllUsers;
 using FluentValidation;
 using Mapster;
 using MapsterMapper;

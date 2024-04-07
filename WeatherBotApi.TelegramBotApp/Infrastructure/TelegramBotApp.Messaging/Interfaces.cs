@@ -1,7 +1,8 @@
 ﻿using RabbitMQ.Client;
-using TelegramBotApp.Domain.Responses;
 using TelegramBotApp.Messaging.EventBusContext;
 using TelegramBotApp.Messaging.IntegrationContext;
+using TelegramBotApp.Messaging.IntegrationResponseContext.IntegrationResponseHandlers;
+using TelegramBotApp.Messaging.IntegrationResponseContext.IntegrationResponses;
 
 namespace TelegramBotApp.Messaging;
 
@@ -13,15 +14,16 @@ public interface IMessageFormatter<in T> where T : class
 
 public interface IEventBus
 {
-    Task<UniversalResponse?> Publish(IntegrationEventBase eventBase, string? replyTo = null,
+    Task<UniversalResponse> Publish(IntegrationEventBase eventBase, string? replyTo = null,
         CancellationToken cancellationToken = default);
 
     void Subscribe<T, TH>()
         where T : IntegrationEventBase
         where TH : IIntegrationEventHandler<T>;
     
-    // TODO: create classes with generic parameter (where parameter is response type) 
-    void SubscribeToResponse(string replyName);
+    void SubscribeResponse<T, TH>()
+        where T : IResponseMessage
+        where TH : IResponseHandler<T>;
 }
 
 public interface IPersistentConnection : IDisposable
@@ -38,8 +40,15 @@ public interface IEventBusSubscriptionsManager
         where T : IntegrationEventBase
         where TH : IIntegrationEventHandler<T>;
 
+    void AddResponseSubscription<T, TH>()
+        where T : IResponseMessage
+        where TH : IResponseHandler<T>;
+
     bool HasSubscriptionsForEvent(string eventName);
+    bool HasSubscriptionsForResponse(string replyName);
     Type? GetEventTypeByName(string eventName);
+    Type? GetResponseTypeByName(string replyName);
     IEnumerable<SubscriptionInfo> GetHandlersForEvent(string eventName);
+    IEnumerable<SubscriptionInfo> GetHandlersForResponse(string replyName);
     string GetEventKey<T>();
 }

@@ -1,9 +1,9 @@
-using FluentResults;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using TelegramBotApp.Application.Factories;
+using TelegramBotApp.Domain.Models;
 using TelegramBotApp.Messaging;
 
 namespace TelegramBotApp.Application.TelegramBotContext;
@@ -83,6 +83,7 @@ public class TelegramBot(ITelegramBotClient telegramBot) : ITelegramBot
         };
 
         Console.WriteLine(errorMessage);
+        
         return Task.CompletedTask;
     }
 }

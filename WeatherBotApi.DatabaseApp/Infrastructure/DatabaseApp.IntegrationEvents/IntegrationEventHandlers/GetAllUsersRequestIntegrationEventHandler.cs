@@ -1,18 +1,20 @@
-using System.Text.Json;
 using DatabaseApp.Application.Users.Queries.GetAllUsers;
 using MediatR;
-using TelegramBotApp.Domain.Responses;
+using Microsoft.Extensions.DependencyInjection;
 using TelegramBotApp.Messaging.IntegrationContext;
 using TelegramBotApp.Messaging.IntegrationContext.UserIntegrationEvents;
+using TelegramBotApp.Messaging.IntegrationResponseContext.IntegrationResponses;
 
 namespace DatabaseApp.IntegrationEvents.IntegrationEventHandlers;
 
-public class GetAllUsersRequestIntegrationEventHandler(ISender mediator)
+public class GetAllUsersRequestIntegrationEventHandler(IServiceScopeFactory factory)
     : IIntegrationEventHandler<GetAllUsersRequestIntegrationEvent>
 {
-    public async Task<UniversalResponse?> Handle(GetAllUsersRequestIntegrationEvent @event)
+    public async Task<IResponseMessage?> Handle(GetAllUsersRequestIntegrationEvent @event)
     {
+        using var scope = factory.CreateScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         var users = await mediator.Send(new GetAllUsersQuery());
-        return new(JsonSerializer.Serialize(users.Select(u => u.TelegramId)));
+        return new AllUsersResponse { UserTelegramIds = users.Select(u => u.TelegramId).ToList() };
     }
 }

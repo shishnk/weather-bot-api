@@ -1,11 +1,13 @@
 using System.Reflection;
 using DatabaseApp.Application;
+using DatabaseApp.IntegrationEvents;
 using DatabaseApp.Persistence;
 using DatabaseApp.Persistence.DatabaseContext;
 using DatabaseApp.WebApi.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Any;
 using Serilog;
+using TelegramBotApp.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,7 +30,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.AddControllers();
-builder.Services.AddApplication().AddPersistence(builder.Configuration);
+builder.Services.AddApplication().AddPersistence(builder.Configuration).AddMessaging(builder.Configuration);
 
 var app = builder.Build();
 
@@ -54,6 +56,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.SubscribeToEvents();
 app.UseHttpsRedirection();
 app.UseExceptionHandler();
 app.UseSerilogRequestLogging();

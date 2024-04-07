@@ -2,7 +2,7 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using TelegramBotApp.Messaging;
 
-namespace TelegramBotApp.Application.TelegramBotContext;
+namespace TelegramBotApp.Domain.Models;
 
 public interface IBotInitializer
 {

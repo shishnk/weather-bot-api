@@ -1,12 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TelegramBotApp.Messaging.IntegrationResponseContext.IntegrationResponseHandlers;
+using TelegramBotApp.Messaging.IntegrationResponseContext.IntegrationResponses;
 
 namespace TelegramBotApp.Messaging;
-
-public static class ReplyNames
-{
-    public const string UniversalReply = "Universal";
-}
 
 public static class EventBusExtensions
 {
@@ -15,9 +12,9 @@ public static class EventBusExtensions
     {
         var eventBus = app.Services.GetRequiredService<IEventBus>();
         
-        // TODO: subscribe to response with handler
-        eventBus.SubscribeToResponse(ReplyNames.UniversalReply);
-
+        eventBus.SubscribeResponse<UniversalResponse, UniversalResponseHandler>();
+        eventBus.SubscribeResponse<AllUsersResponse, AllUserResponseHandler>();
+        
         return app;
     }
 }

@@ -59,3 +59,7 @@ services:
       retries: 3
     ports:
       - "5755:5432"
+  redis:
+    image: 'redis:latest'
+    ports:
+      - "6379:6379"

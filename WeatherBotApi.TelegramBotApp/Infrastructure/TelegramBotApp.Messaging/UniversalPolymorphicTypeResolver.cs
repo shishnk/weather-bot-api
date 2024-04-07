@@ -2,16 +2,18 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
-namespace TelegramBotApp.Messaging.IntegrationContext;
+namespace TelegramBotApp.Messaging;
 
-public class UniversalPolymorphicTypeResolver(Type baseType) : DefaultJsonTypeInfoResolver
+public class CompositionPolymorphicTypeResolver(IEnumerable<Type> baseTypes) : DefaultJsonTypeInfoResolver
 {
     public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)
     {
         var jsonTypeInfo = base.GetTypeInfo(type, options);
-
-        if (jsonTypeInfo.Type != baseType) return jsonTypeInfo;
-
+        
+        var baseType = baseTypes.FirstOrDefault(bt => bt.IsAssignableFrom(jsonTypeInfo.Type));
+        
+        if (baseType == null) return jsonTypeInfo;
+    
         var derivedTypes = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(s => s.GetTypes())
             .Where(p => type.IsAssignableFrom(p) && p is { IsClass: true, IsAbstract: false })
@@ -19,7 +21,7 @@ public class UniversalPolymorphicTypeResolver(Type baseType) : DefaultJsonTypeIn
 
         jsonTypeInfo.PolymorphismOptions = new()
         {
-            TypeDiscriminatorPropertyName = $"{baseType.Name.ToLower()}-type",
+            TypeDiscriminatorPropertyName = $"{jsonTypeInfo.Type.Name.ToLower()}-type",
             IgnoreUnrecognizedTypeDiscriminators = true,
             UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization
         };

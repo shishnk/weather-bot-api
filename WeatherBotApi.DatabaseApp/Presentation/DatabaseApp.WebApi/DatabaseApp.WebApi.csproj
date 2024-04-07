@@ -20,6 +20,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Core\DatabaseApp.Application\DatabaseApp.Application.csproj" />
+      <ProjectReference Include="..\..\Infrastructure\DatabaseApp.IntegrationEvents\DatabaseApp.IntegrationEvents.csproj" />
       <ProjectReference Include="..\..\Infrastructure\DatabaseApp.Persistence\DatabaseApp.Persistence.csproj" />
     </ItemGroup>
 

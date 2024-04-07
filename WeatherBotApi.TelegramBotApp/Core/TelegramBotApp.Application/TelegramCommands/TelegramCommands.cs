@@ -2,6 +2,7 @@ using System.Composition;
 using FluentResults;
 using TelegramBotApp.Messaging;
 using TelegramBotApp.Messaging.IntegrationContext.WeatherForecastIntegrationEvents;
+using TelegramBotApp.Messaging.IntegrationResponseContext.IntegrationResponses;
 
 namespace TelegramBotApp.Application.TelegramCommands;
 
@@ -36,7 +37,7 @@ public class WeatherTelegramCommand : ITelegramCommand
     {
         if (command != Command) throw new InvalidOperationException($"Invalid command {command}");
 
-        var response = await bus.Publish(new WeatherForecastRequestIntegrationEvent(value), ReplyNames.UniversalReply,
+        var response = await bus.Publish(new WeatherForecastRequestIntegrationEvent(value), nameof(UniversalResponse),
             cancellationToken);
 
         return response != null

@@ -2,7 +2,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TelegramBotApp.Application.TelegramBotContext;
+using TelegramBotApp.Caching;
 using TelegramBotApp.Messaging;
+using TelegramBotApp.Messaging.IntegrationContext.UserIntegrationEvents;
+using TelegramBotApp.Messaging.IntegrationResponseContext.IntegrationResponses;
 
 namespace TelegramBotApp.Api.AppPipeline;
 
@@ -15,7 +18,12 @@ public class AppPipeline : IPipeline
             using var host = Host.CreateDefaultBuilder()
                 .ConfigureAppConfiguration(config =>
                     config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true))
-                .ConfigureServices((builder, services) => services.AddMessaging(builder.Configuration))
+                .ConfigureServices((builder, services) => services
+                    .AddMessaging(builder.Configuration)
+                    .AddResponseHandlers()
+                    .AddStackExchangeRedisCache(options =>
+                        options.Configuration = builder.Configuration.GetConnectionString("Redis"))
+                    .AddCaching())
                 .Build()
                 .SubscribeToResponses();
 
@@ -24,6 +32,9 @@ public class AppPipeline : IPipeline
                                                          .GetRequiredSection("TelegramSettings:BotToken").Value ??
                                                      throw new InvalidOperationException("Bot token is not set."));
             var cancellationTokenSource = new CancellationTokenSource();
+            var eventBus = host.Services.GetRequiredService<IEventBus>();
+
+            UpdateCache(eventBus);
 
             botClient.StartReceiving(botInitializer.CreateReceiverOptions(),
                 host.Services.GetRequiredService<IEventBus>(), cancellationTokenSource.Token);
@@ -32,7 +43,7 @@ public class AppPipeline : IPipeline
 
             Console.WriteLine($"Start listening for @{me.Username}");
             Console.ReadLine();
-            
+
             await cancellationTokenSource.CancelAsync();
         }
         catch (Exception e)
@@ -41,4 +52,7 @@ public class AppPipeline : IPipeline
             throw;
         }
     }
+
+    private static void UpdateCache(IEventBus bus) =>
+        _ = bus.Publish(new GetAllUsersRequestIntegrationEvent(), replyTo: nameof(AllUsersResponse));
 }

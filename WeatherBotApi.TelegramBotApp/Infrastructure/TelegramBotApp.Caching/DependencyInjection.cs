@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TelegramBotApp.Caching.Caching;
 
@@ -6,9 +7,12 @@ namespace TelegramBotApp.Caching;
 public static class DependencyInjection
 {
     // ReSharper disable once UnusedMethodReturnValue.Global
-    public static IServiceCollection AddCaching(this IServiceCollection services)
+    public static IServiceCollection AddCaching(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<ICacheService, CacheService>();
+        services.AddStackExchangeRedisCache(options =>
+                options.Configuration = configuration.GetConnectionString("Redis"))
+            .AddSingleton<ICacheService, CacheService>();
+
         return services;
     }
 }

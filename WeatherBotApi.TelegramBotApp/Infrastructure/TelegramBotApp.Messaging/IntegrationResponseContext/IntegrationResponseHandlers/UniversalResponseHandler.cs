@@ -4,5 +4,5 @@ namespace TelegramBotApp.Messaging.IntegrationResponseContext.IntegrationRespons
 
 public class UniversalResponseHandler : IResponseHandler<UniversalResponse>
 {
-    public Task<UniversalResponse?> Handle(UniversalResponse response) => Task.FromResult(response)!;
+    public Task<UniversalResponse> Handle(UniversalResponse response) => Task.FromResult(response);
 }

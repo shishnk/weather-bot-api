@@ -5,7 +5,7 @@ namespace DatabaseApp.Application.UserWeatherSubscriptions.Commands.UpdateUserWe
 
 public class UpdateUserWeatherSubscriptionCommand : IRequest<Result>
 {
-    public int UserTelegramId { get; init; }
+    public long UserTelegramId { get; init; }
     public required string Location { get; init; }
     public TimeSpan ResendInterval { get; init; }
 }

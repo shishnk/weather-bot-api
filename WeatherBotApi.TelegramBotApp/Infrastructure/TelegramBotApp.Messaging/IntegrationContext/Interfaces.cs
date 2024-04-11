@@ -7,5 +7,5 @@ public interface IIntegrationEventHandler;
 public interface IIntegrationEventHandler<in TIntegrationEvent> : IIntegrationEventHandler
     where TIntegrationEvent : IntegrationEventBase
 {
-    Task<IResponseMessage?> Handle(TIntegrationEvent @event);
+    Task<IResponseMessage> Handle(TIntegrationEvent @event);
 }

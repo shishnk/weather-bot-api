@@ -17,10 +17,8 @@ public static class DependencyInjection
         services.AddSingleton<IPersistentConnection, PersistentConnection>();
         services.AddSingleton<IEventBus, EventBus>();
         services.AddSingleton<IEventBusSubscriptionsManager, EventBusSubscriptionManager>();
-        services.AddSingleton<ISettings, RabbitMqSettings>(_ => settings ?? new RabbitMqSettings
-        {
-            HostName = "localhost"
-        });
+        services.AddSingleton<IMessageSettings, RabbitMqSettings>(_ =>
+            settings ?? throw new InvalidOperationException("RabbitMqSettings not found"));
         services.AddSingleton<IJsonOptions, JsonOptions>();
 
         var interfaceType = typeof(IIntegrationEventHandler);

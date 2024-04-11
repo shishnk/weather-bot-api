@@ -36,8 +36,8 @@ namespace DatabaseApp.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("TIMESTAMP");
 
-                    b.Property<int>("TelegramId")
-                        .HasColumnType("integer")
+                    b.Property<long>("TelegramId")
+                        .HasColumnType("bigint")
                         .HasColumnName("TELEGRAM_ID");
 
                     b.HasKey("Id");
@@ -77,7 +77,7 @@ namespace DatabaseApp.Persistence.Migrations
                             b1.Property<int>("UserId")
                                 .HasColumnType("integer");
 
-                            b1.Property<string>("Number")
+                            b1.Property<string>("MobileNumber")
                                 .IsRequired()
                                 .HasColumnType("text")
                                 .HasColumnName("MOBILE_NUMBER");

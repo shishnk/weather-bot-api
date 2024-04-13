@@ -1,3 +1,0 @@
-namespace TelegramBotApp.Messaging.IntegrationResponseContext.IntegrationResponses;
-
-public interface IResponseMessage;

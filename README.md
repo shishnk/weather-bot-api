@@ -1,4 +1,4 @@
-# WeatherBotApi (in progress...)
+# WeatherBotApi
 
 ## Overview
 
@@ -11,6 +11,10 @@ WeatherBot is a Telegram bot designed to provide weather data to users. The proj
 1. **TelegramApi:** A service responsible for handling user requests via the Telegram bot.
 2. **DatabaseService:** A service responsible for database operations, including storing and retrieving user data and their requests.
 3. **WeatherService:** A service responsible for fetching weather information from an external source.
+
+## Weather API
+The [wttr.in](https://github.com/chubin/wttr.in) is used to provide weather, which is  a console-oriented weather forecast service that supports various information representation methods like terminal-oriented ANSI-sequences for console HTTP clients (curl, httpie, or wget), HTML for web browsers, or PNG for graphical viewers.
+
 
 ## Architecture
 
@@ -34,6 +38,7 @@ flowchart TD;
 - PostgreSQL
 - Mapster
 - Docker
+- Redis
 - xUnit
 
 ## Installation and Running
@@ -51,7 +56,7 @@ flowchart TD;
     ```bash
     docker-compose up
     ```
-
+    
 ## Configuration
 
 Before running the project, ensure you have configured the necessary environment variables:
@@ -60,15 +65,19 @@ Before running the project, ensure you have configured the necessary environment
     - Create a new bot via [BotFather](https://t.me/botfather) on Telegram.
     - Obtain the token for accessing the bot's API.
 
-2. **Set Environment Variables:**
-    - Create a `.env` file in the project's root directory.
-    - Add the following variables to the `.env` file:
-      ```plaintext
-      TELEGRAM_BOT_TOKEN=YOUR_TELEGRAM_BOT_TOKEN
+2. **Update appsettings.json:**
+    - Navigate to the directory `WeatherBotApi.TelegramBotApp\Presentation\TelegramBotApp.Api\`.
+    - Open the `appsettings.json` file.
+    - Add or update the following section with your Telegram bot token:
+      ```json
+      "TelegramSettings": {
+        "BotToken": "YOUR_TELEGRAM_BOT_TOKEN"
+      }
       ```
-    - Replace `YOUR_TELEGRAM_BOT_TOKEN` with your Telegram bot token.
+    - Replace `"YOUR_TELEGRAM_BOT_TOKEN"` with your actual Telegram bot token obtained from BotFather.
 
-Once you have configured the environment variables, you are ready to run the project.
+Once you have configured the environment variables and updated the `appsettings.json` file, you are ready to run the project.
+
 
 ## Contribution and Feedback
 

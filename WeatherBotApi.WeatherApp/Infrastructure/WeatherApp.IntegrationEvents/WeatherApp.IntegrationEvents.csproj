@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\WeatherBotApi.TelegramBotApp\Core\TelegramBotApp.Domain\TelegramBotApp.Domain.csproj" />
+      <ProjectReference Include="..\..\..\WeatherBotApi.TelegramBotApp\Infrastructure\TelegramBotApp.Messaging\TelegramBotApp.Messaging.csproj" />
+      <ProjectReference Include="..\..\Core\WeatherApp.Application\WeatherApp.Application.csproj" />
+    </ItemGroup>
+
+</Project>

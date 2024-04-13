@@ -17,16 +17,16 @@ public interface IRepository
 
 public interface IUserRepository : IRepository
 {
-    Task<User?> GetByTelegramIdAsync(int telegramId, CancellationToken cancellationToken);
+    Task<User?> GetByTelegramIdAsync(long telegramId, CancellationToken cancellationToken);
     Task AddAsync(User user, CancellationToken cancellationToken);
     Task<List<User>> GetAllAsync(CancellationToken cancellationToken);
 }
 
 public interface IWeatherSubscriptionRepository : IRepository
 {
-    Task<List<UserWeatherSubscription>> GetAllByUserTelegramId(int userTelegramId, CancellationToken cancellationToken);
+    Task<List<UserWeatherSubscription>> GetAllByUserTelegramId(long userTelegramId, CancellationToken cancellationToken);
 
-    Task<UserWeatherSubscription?> GetByUserTelegramIdAndLocationAsync(int userTelegramId, Location location,
+    Task<UserWeatherSubscription?> GetByUserTelegramIdAndLocationAsync(long userTelegramId, Location location,
         CancellationToken cancellationToken);
 
     Task AddAsync(UserWeatherSubscription weatherSubscription, CancellationToken cancellationToken);

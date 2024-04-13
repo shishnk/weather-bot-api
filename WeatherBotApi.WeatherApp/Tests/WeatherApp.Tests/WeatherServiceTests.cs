@@ -27,9 +27,9 @@ public class WeatherServiceTests(WeatherServiceFixture weatherServiceFixture) : 
 
         // Act
         var result = await controller.GetWeatherForecast(location);
-        var okResult = result as OkObjectResult;
 
         // Assert
+        var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
         okResult.Should().NotBeNull();
         okResult?.StatusCode.Should().Be(StatusCodes.Status200OK);
     }
@@ -42,9 +42,9 @@ public class WeatherServiceTests(WeatherServiceFixture weatherServiceFixture) : 
 
         // Act
         var result = await controller.GetWeatherForecast("InvalidLocation");
-        var badRequestResult = result as BadRequestObjectResult;
 
         // Assert
+        var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
         badRequestResult.Should().NotBeNull();
         badRequestResult?.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
     }

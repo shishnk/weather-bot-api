@@ -8,14 +8,14 @@ namespace DatabaseApp.Persistence.Repositories;
 public class WeatherSubscriptionRepository(IDatabaseContext context)
     : RepositoryBase<UserWeatherSubscription>(context), IWeatherSubscriptionRepository
 {
-    public Task<List<UserWeatherSubscription>> GetAllByUserTelegramId(int userTelegramId,
+    public Task<List<UserWeatherSubscription>> GetAllByUserTelegramId(long userTelegramId,
         CancellationToken cancellationToken) =>
         _context.UserWeatherSubscriptions
             .Include(s => s.User)
             .Where(s => s.User.TelegramId == userTelegramId)
             .ToListAsync(cancellationToken);
 
-    public Task<UserWeatherSubscription?> GetByUserTelegramIdAndLocationAsync(int userTelegramId, Location location,
+    public Task<UserWeatherSubscription?> GetByUserTelegramIdAndLocationAsync(long userTelegramId, Location location,
         CancellationToken cancellationToken) =>
         _context.UserWeatherSubscriptions
             .Include(s => s.User)

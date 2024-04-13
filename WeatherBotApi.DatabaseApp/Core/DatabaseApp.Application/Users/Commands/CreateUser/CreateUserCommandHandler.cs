@@ -6,15 +6,15 @@ using MediatR;
 namespace DatabaseApp.Application.Users.Commands.CreateUser;
 
 // ReSharper disable once UnusedType.Global
-public class CreateUserCommandHandler(IUserRepository repository) : IRequestHandler<CreateUserCommand, Result<int>>
+public class CreateUserCommandHandler(IUserRepository repository) : IRequestHandler<CreateUserCommand, Result<long>>
 {
-    public async Task<Result<int>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+    public async Task<Result<long>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
         var existingUser = await repository.GetByTelegramIdAsync(request.TelegramId, cancellationToken);
 
         if (existingUser != null)
         {
-            return Result.Fail<int>("User already exists");
+            return Result.Fail("User already exists");
         }
 
         var userMetadata = UserMetadata.Create(request.Username, request.MobileNumber);

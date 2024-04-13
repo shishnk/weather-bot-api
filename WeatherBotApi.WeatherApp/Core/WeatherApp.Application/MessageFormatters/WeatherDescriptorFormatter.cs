@@ -7,6 +7,7 @@ public class WeatherDescriptorFormatter : IMessageFormatter<WeatherDescriptor>
 {
     public string Format(WeatherDescriptor value) =>
         $"""
+         Location: {value.Location}
          Temperature: {value.Temperature}°C
          Feels Like: {value.FeelTemperature}°C
          Humidity: {value.Humidity}%

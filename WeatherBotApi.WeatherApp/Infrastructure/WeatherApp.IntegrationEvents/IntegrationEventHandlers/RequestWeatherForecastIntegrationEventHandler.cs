@@ -12,7 +12,10 @@ public class WeatherForecastRequestIntegrationEventHandler(IWeatherService weath
 {
     private readonly WeatherDescriptorFormatter _messageFormatter = new();
 
-    public async Task<IResponseMessage?> Handle(WeatherForecastRequestIntegrationEvent eventBase) =>
-        new UniversalResponse(
-            _messageFormatter.Format(await weatherService.GetWeatherForecastAsync(eventBase.Location)));
+    public async Task<IResponseMessage> Handle(WeatherForecastRequestIntegrationEvent @event)
+    {
+        var weatherDescriptor = await weatherService.GetWeatherForecastAsync(@event.Location);
+        weatherDescriptor.SetLocation(@event.Location);
+        return new UniversalResponse(_messageFormatter.Format(weatherDescriptor));
+    }
 }

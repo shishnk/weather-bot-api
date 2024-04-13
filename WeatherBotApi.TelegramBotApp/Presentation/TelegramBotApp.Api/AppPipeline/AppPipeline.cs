@@ -1,9 +1,12 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using TelegramBotApp.Application.TelegramBotContext;
+using TelegramBotApp.Application;
 using TelegramBotApp.Caching;
+using TelegramBotApp.Caching.Caching;
+using TelegramBotApp.Domain.Models;
 using TelegramBotApp.Messaging;
+using TelegramBotApp.Messaging.Common;
 using TelegramBotApp.Messaging.IntegrationContext.UserIntegrationEvents;
 using TelegramBotApp.Messaging.IntegrationResponseContext.IntegrationResponses;
 
@@ -19,25 +22,27 @@ public class AppPipeline : IPipeline
                 .ConfigureAppConfiguration(config =>
                     config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true))
                 .ConfigureServices((builder, services) => services
+                    .AddApplication(builder.Configuration)
                     .AddMessaging(builder.Configuration)
                     .AddResponseHandlers()
-                    .AddStackExchangeRedisCache(options =>
-                        options.Configuration = builder.Configuration.GetConnectionString("Redis"))
-                    .AddCaching())
+                    .AddCaching(builder.Configuration))
                 .Build()
                 .SubscribeToResponses();
 
-            var botInitializer = new TelegramBotInitializer();
-            var botClient = botInitializer.CreateBot(host.Services.GetRequiredService<IConfiguration>()
-                                                         .GetRequiredSection("TelegramSettings:BotToken").Value ??
-                                                     throw new InvalidOperationException("Bot token is not set."));
             var cancellationTokenSource = new CancellationTokenSource();
             var eventBus = host.Services.GetRequiredService<IEventBus>();
+            var botClient = host.Services.GetRequiredService<ITelegramBot>();
+            var cacheService = host.Services.GetRequiredService<ICacheService>();
+            var resendMessageService = host.Services.GetRequiredService<IResendMessageService>();
 
-            UpdateCache(eventBus);
+            await UpdateCache(eventBus);
+            await InitializeResendMessageService(resendMessageService, cacheService);
 
-            botClient.StartReceiving(botInitializer.CreateReceiverOptions(),
-                host.Services.GetRequiredService<IEventBus>(), cancellationTokenSource.Token);
+            botClient.StartReceiving(
+                eventBus,
+                cacheService,
+                resendMessageService,
+                cancellationTokenSource.Token);
 
             var me = await botClient.GetMeAsync();
 
@@ -53,6 +58,22 @@ public class AppPipeline : IPipeline
         }
     }
 
-    private static void UpdateCache(IEventBus bus) =>
-        _ = bus.Publish(new GetAllUsersRequestIntegrationEvent(), replyTo: nameof(AllUsersResponse));
+    private static async Task UpdateCache(IEventBus bus)
+    {
+        var task1 = bus.Publish(new CacheRequestUsersIntegrationEvent(),
+            replyTo: nameof(UniversalResponse)); // TODO: fix cancellation token (common settings for bus), fix reply 
+        var task2 = bus.Publish(new CacheRequestUserSubscriptionsIntegrationEvent(),
+            replyTo: nameof(UniversalResponse));
+
+        await Task.WhenAll(task1, task2);
+    }
+
+    private static async Task InitializeResendMessageService(IResendMessageService messageService,
+        ICacheService cacheService)
+    {
+        var subscriptionInfos = await cacheService.GetAsync<List<UserSubscriptionInfo>>("allSubscriptions");
+        if (subscriptionInfos?.Count == 0) return;
+        subscriptionInfos?.ForEach(s =>
+            messageService.AddOrUpdateResendProcess(s.TelegramId, s.Location, s.ResendInterval));
+    }
 }

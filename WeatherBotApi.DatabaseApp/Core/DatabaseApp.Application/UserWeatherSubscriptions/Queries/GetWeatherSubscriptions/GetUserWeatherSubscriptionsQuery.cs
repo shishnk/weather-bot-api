@@ -4,5 +4,5 @@ namespace DatabaseApp.Application.UserWeatherSubscriptions.Queries.GetWeatherSub
 
 public class GetUserWeatherSubscriptionsQuery : IRequest<List<UserWeatherSubscriptionDto>>
 {
-    public int UserTelegramId { get; init; }
+    public long UserTelegramId { get; init; }
 }

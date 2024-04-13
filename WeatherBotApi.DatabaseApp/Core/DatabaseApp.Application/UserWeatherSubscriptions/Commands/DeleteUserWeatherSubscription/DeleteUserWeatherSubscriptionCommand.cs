@@ -5,6 +5,6 @@ namespace DatabaseApp.Application.UserWeatherSubscriptions.Commands.DeleteUserWe
 
 public class DeleteUserWeatherSubscriptionCommand : IRequest<Result>
 {
-    public int UserTelegramId { get; init; }
+    public long UserTelegramId { get; init; }
     public required string Location { get; init; }
 }

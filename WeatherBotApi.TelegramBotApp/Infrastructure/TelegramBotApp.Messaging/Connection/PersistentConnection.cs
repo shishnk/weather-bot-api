@@ -3,11 +3,12 @@ using Microsoft.Extensions.Logging;
 using Polly;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
+using TelegramBotApp.Messaging.Settings;
 
 namespace TelegramBotApp.Messaging.Connection;
 
 public sealed class PersistentConnection(
-    // IConfiguration configuration,
+    IMessageSettings messageSettings,
     ILogger<PersistentConnection> logger,
     int retryCount = 3)
     : IPersistentConnection
@@ -29,16 +30,30 @@ public sealed class PersistentConnection(
                 (ex, time) => logger.LogWarning(ex,
                     "RabbitMQ Client could not connect after {TimeOut}s ({ExceptionMessage})",
                     $"{time.TotalSeconds:n1}", ex.Message));
-
-        policy.Execute(() =>
+        
+        ConnectionFactory connectionFactory;
+        
+        if (messageSettings.HasConnectionString)
         {
-            var connectionFactory = new ConnectionFactory
+            connectionFactory = new()
             {
-                HostName = "localhost",
+                Uri = new(messageSettings.ConnectionString!),
+                DispatchConsumersAsync = true
+            }; 
+        }
+        else
+        {
+            connectionFactory = new()
+            {
+                HostName = messageSettings.HostName,
+                Port = messageSettings.Port,
+                UserName = messageSettings.Username,
+                Password = messageSettings.Password,
                 DispatchConsumersAsync = true
             };
-            _connection = connectionFactory.CreateConnection();
-        });
+        }
+
+        policy.Execute(() => _connection = connectionFactory.CreateConnection());
 
         if (_connection == null)
         {

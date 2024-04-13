@@ -10,7 +10,9 @@ public class RegisterMapper : IRegister
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<UserWeatherSubscription, UserWeatherSubscriptionDto>()
-            .Map(dest => dest.Location, src => src.Location.Value);
+            .Map(dest => dest.Location, src => src.Location.Value)
+            .Map(dest => dest.ResendInterval, src => src.ResendInterval)
+            .Map(dest => dest.UserTelegramId, src => src.User.TelegramId);
         config.NewConfig<User, UserDto>()
             .Map(dest => dest.TelegramId, src => src.TelegramId)
             .Map(dest => dest.MobileNumber, src => src.Metadata.MobileNumber)

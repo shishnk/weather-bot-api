@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DatabaseApp.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class Initialize : Migration
+    public partial class Initialization : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,7 +19,7 @@ namespace DatabaseApp.Persistence.Migrations
                     ID = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:IdentitySequenceOptions", "'1', '1', '', '', 'False', '1'")
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TELEGRAM_ID = table.Column<int>(type: "integer", nullable: false),
+                    TELEGRAM_ID = table.Column<long>(type: "bigint", nullable: false),
                     USERNAME = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     MOBILE_NUMBER = table.Column<string>(type: "text", nullable: false),
                     TIMESTAMP = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)

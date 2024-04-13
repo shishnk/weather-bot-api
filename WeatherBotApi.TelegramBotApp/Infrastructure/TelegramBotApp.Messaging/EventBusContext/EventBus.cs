@@ -16,6 +16,7 @@ namespace TelegramBotApp.Messaging.EventBusContext;
 
 public class EventBus(
     IPersistentConnection persistentConnection,
+    IMessageSettings messageSettings,
     ILogger<EventBus> logger,
     IEventBusSubscriptionsManager subscriptionsManager,
     IServiceProvider serviceProvider,
@@ -23,19 +24,15 @@ public class EventBus(
     int retryCount = 3)
     : IEventBus
 {
-    private const string DirectEventExchange = "direct-event-exchange";
-    private const string DirectResponseExchange = "direct-response-exchange";
-    private const string EventQueue = "event-queue";
-    private const string ResponseQueue = "response-queue";
-
-    private IModel _channel = null!;
+    private IModel? _channel;
     private readonly ConcurrentDictionary<string, TaskCompletionSource<UniversalResponse>> _callbackMapper = new();
-    private bool _isInitialized;
+    private bool _isStandartQueueInitialized;
+    private bool _isResponseQueueInitialized;
 
     public Task<UniversalResponse> Publish(IntegrationEventBase eventBase, string? replyTo = null,
         CancellationToken cancellationToken = default)
     {
-        if (!_isInitialized) EnsureInitialize();
+        if (_channel == null) throw new InvalidOperationException("RabbitMQ channel is not initialized");
 
         var policy = Policy.Handle<BrokerUnreachableException>()
             .Or<SocketException>()
@@ -46,6 +43,7 @@ public class EventBus(
 
         var body = JsonSerializer.SerializeToUtf8Bytes(eventBase, jsonOptions.Options);
         var tcs = new TaskCompletionSource<UniversalResponse>();
+
         var properties = _channel.CreateBasicProperties();
         properties.CorrelationId = eventBase.Id.ToString();
         properties.ReplyTo = replyTo;
@@ -61,7 +59,7 @@ public class EventBus(
         {
             logger.LogInformation("Publishing event to RabbitMQ: {EventName}", eventBase.Name);
             _channel.BasicPublish(
-                exchange: DirectEventExchange,
+                exchange: messageSettings.EventExchangeName,
                 routingKey: eventBase.Name,
                 basicProperties: properties,
                 body: body);
@@ -74,14 +72,14 @@ public class EventBus(
         where T : IntegrationEventBase
         where TH : IIntegrationEventHandler<T>
     {
-        if (!_isInitialized) EnsureInitialize();
+        if (!_isStandartQueueInitialized) EnsureBasicInitialize();
 
         var eventName = subscriptionsManager.GetEventKey<T>();
 
         if (subscriptionsManager.HasSubscriptionsForEvent(eventName)) return;
 
-        _channel.QueueBind(queue: EventQueue,
-            exchange: DirectEventExchange,
+        _channel.QueueBind(queue: messageSettings.EventQueueName,
+            exchange: messageSettings.EventExchangeName,
             routingKey: eventName);
 
         logger.LogInformation("Subscribing to event {EventName} with {EventHandler}", eventName,
@@ -96,14 +94,14 @@ public class EventBus(
         where T : IResponseMessage
         where TH : IResponseHandler<T>
     {
-        if (!_isInitialized) EnsureInitialize();
+        if (!_isResponseQueueInitialized) InitializeResponseQueue();
 
         var replyName = subscriptionsManager.GetEventKey<T>();
 
         if (subscriptionsManager.HasSubscriptionsForResponse(replyName)) return;
 
-        _channel.QueueBind(queue: ResponseQueue,
-            exchange: DirectResponseExchange,
+        _channel.QueueBind(queue: messageSettings.ResponseQueueName,
+            exchange: messageSettings.ResponseExchangeName,
             routingKey: replyName);
 
         logger.LogInformation("Subscribing to response {ResponseName}", replyName);
@@ -111,7 +109,7 @@ public class EventBus(
         subscriptionsManager.AddResponseSubscription<T, TH>();
 
         var responseConsumer = new AsyncEventingBasicConsumer(_channel);
-        
+
         // TODO: avoid code duplication
         responseConsumer.Received += async (_, ea) =>
         {
@@ -160,44 +158,31 @@ public class EventBus(
             }
         };
 
-        _channel.BasicConsume(queue: ResponseQueue, autoAck: true, consumer: responseConsumer);
+        _channel.BasicConsume(queue: messageSettings.ResponseQueueName, autoAck: true, consumer: responseConsumer);
+        _isResponseQueueInitialized = true;
     }
 
-    private void EnsureInitialize()
+    private void EnsureBasicInitialize()
     {
-        if (!persistentConnection.IsConnected)
-        {
-            if (!persistentConnection.TryConnect())
-            {
-                logger.LogError("Could not connect to RabbitMQ");
-                return;
-            }
-        }
+        if (!TryConnect()) return;
 
-        _channel = persistentConnection.CreateModel();
-
-        _channel.ExchangeDeclare(exchange: DirectEventExchange, type: ExchangeType.Direct);
-        _channel.ExchangeDeclare(exchange: DirectResponseExchange, type: ExchangeType.Direct);
-
+        _channel ??= persistentConnection.CreateModel();
+        _channel.ExchangeDeclare(exchange: messageSettings.EventExchangeName, type: ExchangeType.Direct);
         _channel.QueueDeclare(
-            queue: EventQueue,
-            durable: true,
-            exclusive: false,
-            autoDelete: true,
-            arguments: null);
-        _channel.QueueDeclare(
-            queue: ResponseQueue,
+            queue: messageSettings.EventQueueName,
             durable: true,
             exclusive: false,
             autoDelete: true,
             arguments: null);
         _channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
 
-        _isInitialized = true;
+        _isStandartQueueInitialized = true;
     }
 
     private void StartConsume()
     {
+        if (_channel == null) throw new InvalidOperationException("RabbitMQ channel is not initialized");
+
         var eventConsumer = new AsyncEventingBasicConsumer(_channel);
 
         eventConsumer.Received += async (_, ea) =>
@@ -227,17 +212,15 @@ public class EventBus(
                     var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
 
                     var task = concreteType.GetMethod("Handle")
-                                   ?.Invoke(handler, [integrationEvent]) as Task<IResponseMessage?> ??
+                                   ?.Invoke(handler, [integrationEvent]) as Task<IResponseMessage> ??
                                throw new InvalidCastException();
                     var response = await task;
-
-                    if (response == null) continue;
 
                     var properties = _channel.CreateBasicProperties();
                     properties.CorrelationId = ea.BasicProperties.CorrelationId;
 
                     _channel.BasicPublish(
-                        exchange: DirectResponseExchange,
+                        exchange: messageSettings.ResponseExchangeName,
                         routingKey: ea.BasicProperties.ReplyTo,
                         basicProperties: properties,
                         body: JsonSerializer.SerializeToUtf8Bytes(response, jsonOptions.Options));
@@ -250,6 +233,30 @@ public class EventBus(
             }
         };
 
-        _channel.BasicConsume(queue: EventQueue, autoAck: false, consumer: eventConsumer);
+        _channel.BasicConsume(queue: messageSettings.EventQueueName, autoAck: false, consumer: eventConsumer);
+    }
+
+    private void InitializeResponseQueue()
+    {
+        if (!TryConnect()) return;
+
+        _channel ??= persistentConnection.CreateModel();
+        _channel.ExchangeDeclare(exchange: messageSettings.ResponseExchangeName, type: ExchangeType.Direct);
+        _channel.QueueDeclare(
+            queue: messageSettings.ResponseQueueName,
+            durable: true,
+            exclusive: false,
+            autoDelete: true,
+            arguments: null);
+    }
+
+    private bool TryConnect()
+    {
+        if (persistentConnection.IsConnected) return true;
+        if (persistentConnection.TryConnect()) return true;
+
+        logger.LogError("Could not connect to RabbitMQ");
+
+        return false;
     }
 }

@@ -1,25 +1,41 @@
+using FluentResults;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using TelegramBotApp.Application.Factories;
+using TelegramBotApp.Application.Services;
+using TelegramBotApp.Caching.Caching;
 using TelegramBotApp.Domain.Models;
 using TelegramBotApp.Messaging;
+using TelegramBotApp.Messaging.IntegrationContext.UserIntegrationEvents;
 
 namespace TelegramBotApp.Application.TelegramBotContext;
 
-public class TelegramBot(ITelegramBotClient telegramBot) : ITelegramBot
+public class TelegramBot(ITelegramBotClient telegramBot, ReceiverOptions receiverOptions) : ITelegramBot
 {
-    private readonly TimeSpan _timeout = TimeSpan.FromSeconds(30);
     private const string HelpCommand = "/help";
 
-    public void StartReceiving(ReceiverOptions receiverOptions, IEventBus bus, CancellationToken cancellationToken) =>
+    private readonly ITelegramBotSettings _settings = TelegramBotSettings.CreateDefault();
+    private TelegramCommandFactory _telegramCommandFactory = null!; // TODO: Refactor to use DI
+    private ICacheService _cacheService = null!;
+
+    public void StartReceiving(IEventBus bus, ICacheService cacheService, IResendMessageService messageService,
+        CancellationToken cancellationToken)
+    {
+        _telegramCommandFactory = new(bus, cacheService, messageService, _settings);
+        _cacheService = cacheService;
+
         telegramBot.StartReceiving(
             updateHandler: async (botClient, update, token) =>
                 await HandleUpdateInnerAsync(botClient, update, bus, token),
             pollingErrorHandler: HandlePollingErrorInner,
             receiverOptions: receiverOptions,
             cancellationToken: cancellationToken);
+    }
+
+    public Task SendMessageAsync(long telegramId, string message) =>
+        telegramBot.SendTextMessageAsync(telegramId, message);
 
     public Task<User> GetMeAsync() => telegramBot.GetMeAsync();
 
@@ -29,45 +45,39 @@ public class TelegramBot(ITelegramBotClient telegramBot) : ITelegramBot
         if (update.Message is not { } message) return;
         if (message.Text is not { } messageText) return;
 
-        var chatId = message.Chat.Id;
-        using var cts = new CancellationTokenSource(_timeout);
+        var chatId = message.Chat.Id; // chat id equals to user telegram id
+        using var cts = new CancellationTokenSource(_settings.Timeout);
 
         try
         {
-            var args = messageText.Split(' ');
-            var command = TelegramCommandFactory.GetCommand(args[0]);
+            _ = Task.Run(async () => await UpdateUsersCacheAsync(
+                    message,
+                    bus,
+                    cancellationToken),
+                cancellationToken);
+            var result = await _telegramCommandFactory.StartCommand(messageText, chatId);
 
-            if (command.IsFailed)
+            if (result.IsFailed)
             {
-                await HandleError(botClient, chatId);
+                await HandleError(botClient, chatId, result);
                 return;
             }
 
-            var response =
-                await command.Value.Execute(args[0], args.Length > 1 ? args[1] : string.Empty, bus, cts.Token);
-
-            if (response.IsFailed)
-            {
-                await HandleError(botClient, chatId);
-                return;
-            }
-
-            await botClient.SendTextMessageAsync(chatId: chatId, response.Value,
+            await botClient.SendTextMessageAsync(chatId: chatId, result.Value,
                 cancellationToken: cancellationToken);
         }
         catch (Exception)
         {
-            await HandleError(botClient, chatId);
+            await HandleError(botClient, chatId, result: Result.Fail("Internal error"));
         }
 
         return;
 
-        async Task HandleError(ITelegramBotClient bot, long chatIdInner)
+        async Task HandleError(ITelegramBotClient bot, long chatIdInner, IResultBase result)
         {
-            var text = await TelegramCommandFactory
-                .GetCommand(HelpCommand)
-                .Value
-                .Execute(HelpCommand, string.Empty, bus, CancellationToken.None);
+            await bot.SendTextMessageAsync(chatId: chatIdInner, result.Errors.First().Message,
+                cancellationToken: cancellationToken);
+            var text = await _telegramCommandFactory.StartCommand(HelpCommand, chatIdInner);
             await bot.SendTextMessageAsync(chatId: chatIdInner, text.Value, cancellationToken: cancellationToken);
         }
     }
@@ -83,7 +93,23 @@ public class TelegramBot(ITelegramBotClient telegramBot) : ITelegramBot
         };
 
         Console.WriteLine(errorMessage);
-        
+
         return Task.CompletedTask;
+    }
+
+    private async Task UpdateUsersCacheAsync(Message message, IEventBus bus, CancellationToken cancellationToken)
+    {
+        var userTelegramIds = await _cacheService.GetAsync<List<long>>("allUsers", cancellationToken);
+
+        if (userTelegramIds?.Contains(message.From!.Id) == false)
+        {
+            _ = await bus.Publish(new CreatedUserIntegrationEvent
+            {
+                MobileNumber = message.Contact?.PhoneNumber ?? "fake-number",
+                Username = message.From?.Username ?? string.Empty,
+                UserTelegramId = message.From?.Id ?? 0,
+                RegisteredAt = DateTime.UtcNow
+            }, cancellationToken: cancellationToken);
+        }
     }
 }

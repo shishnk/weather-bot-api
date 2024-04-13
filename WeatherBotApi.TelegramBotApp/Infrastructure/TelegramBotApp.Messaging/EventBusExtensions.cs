@@ -11,10 +11,9 @@ public static class EventBusExtensions
     public static IHost SubscribeToResponses(this IHost app)
     {
         var eventBus = app.Services.GetRequiredService<IEventBus>();
-        
+
         eventBus.SubscribeResponse<UniversalResponse, UniversalResponseHandler>();
-        eventBus.SubscribeResponse<AllUsersResponse, AllUserResponseHandler>();
-        
+
         return app;
     }
 }

@@ -8,7 +8,7 @@ namespace DatabaseApp.Persistence.Repositories;
 public class UserRepository(IDatabaseContext context)
     : RepositoryBase<User>(context), IUserRepository
 {
-    public Task<User?> GetByTelegramIdAsync(int telegramId, CancellationToken cancellationToken) =>
+    public Task<User?> GetByTelegramIdAsync(long telegramId, CancellationToken cancellationToken) =>
         _context.Users
             .FirstOrDefaultAsync(u => u.TelegramId == telegramId, cancellationToken);
 

@@ -7,12 +7,12 @@ namespace WeatherApp.WebApi.Controllers;
 [Route("api/[controller]/[action]")]
 public class WeatherController(IWeatherService weatherService, ILogger<WeatherController> logger) : ControllerBase
 {
-    [HttpGet("{location:required}")]
+    [HttpGet]
     public async Task<IActionResult> GetWeatherForecast(string location)
     {
         try
         {
-            logger.LogInformation("Getting weather forecast for {location}", location);
+            logger.LogInformation("Getting weather forecast for {Location}", location);
             var descriptor = await weatherService.GetWeatherForecastAsync(location);
 
             logger.LogInformation("Weather forecast for {Location} retrieved successfully", location);

@@ -2,7 +2,7 @@
 
 ## Overview
 
-WeatherBotApi is an educational project aimed at learning microservices development on the .NET platform and improving skills in ASP.NET, RabbitMQ, Entity Framework, PostgreSQL, Mapster, Docker, and xUnit.
+WeatherBotApi is an educational project aimed at learning microservices development on the .NET platform and improving skills in ASP.NET, RabbitMQ, Entity Framework, PostgreSQL, Mapster, Redis, Docker, and xUnit.
 
 ## Description
 
@@ -49,7 +49,7 @@ flowchart TD;
    ```
 2. **Build Docker containers:**
     ```bash
-    git cd WeatherBot
+    git cd weather-bot-api
     docker-compose build
     ```
 3. **Run containers:**
@@ -65,18 +65,15 @@ Before running the project, ensure you have configured the necessary environment
     - Create a new bot via [BotFather](https://t.me/botfather) on Telegram.
     - Obtain the token for accessing the bot's API.
 
-2. **Update appsettings.json:**
-    - Navigate to the directory `WeatherBotApi.TelegramBotApp\Presentation\TelegramBotApp.Api\`.
-    - Open the `appsettings.json` file.
-    - Add or update the following section with your Telegram bot token:
-      ```json
-      "TelegramSettings": {
-        "BotToken": "YOUR_TELEGRAM_BOT_TOKEN"
-      }
+2. **Update the existing .env file:**
+    - Open file in the root directory of your project.
+    - Add or update the following line in the .env file with your Telegram bot token:
       ```
-    - Replace `"YOUR_TELEGRAM_BOT_TOKEN"` with your actual Telegram bot token obtained from BotFather.
+      TELEGRAM_BOT_TOKEN=YOUR_TELEGRAM_BOT_TOKEN
+      ```
+    - Replace `YOUR_TELEGRAM_BOT_TOKEN` with your actual Telegram bot token obtained from BotFather.
 
-Once you have configured the environment variables and updated the `appsettings.json` file, you are ready to run the project.
+Once you have updated the existing .env file with your Telegram bot token, you are ready to run the project.
 
 
 ## Contribution and Feedback

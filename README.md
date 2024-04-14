@@ -1,3 +1,8 @@
+[![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](./LICENSE)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/shishnk/weather-bot-api/dotnet.yml?style=for-the-badge&label=BUILD%2FTESTS)
+![Coveralls](https://img.shields.io/coverallsCoverage/github/shishnk/weather-bot-api?style=for-the-badge)
+![Website](https://img.shields.io/website?url=https%3A%2F%2Fwttr.in%2F&style=for-the-badge&label=wttr.in)
+
 # WeatherBotApi
 
 ## Overview

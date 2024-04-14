@@ -117,6 +117,8 @@ public class CreateSubscriptionTelegramCommand : ITelegramCommand
             return "Invalid format for resend interval. Please use the format hh:mm".ToResult();
         }
 
+        if (minutes > 59) return "Minutes should be less than 60".ToResult();
+
         var resendInterval = new TimeSpan(hours, minutes, 0);
 
         if (resendInterval < TimeSpan.FromMinutes(30)) // hardcode
@@ -169,7 +171,7 @@ public class GetUserWeatherSubscriptionsTelegramCommand : ITelegramCommand
         {
             var subscription = userSubscriptions[i];
             message.AppendLine(
-                $"{i + 1}) Location: {subscription.Location}, resend interval: {subscription.ResendInterval.ToString(@"hh\:mm")}");
+                $"{i + 1}) Location: {subscription.Location}, resend interval: {(int)subscription.ResendInterval.TotalHours}:{subscription.ResendInterval.Minutes}");
         }
 
         return message.Length > 0
@@ -218,6 +220,8 @@ public class UpdateSubscriptionTelegramCommand : ITelegramCommand
         {
             return "Invalid format for resend interval. Please use the format hh:mm".ToResult();
         }
+
+        if (minutes > 59) return "Minutes should be less than 60".ToResult();
 
         var resendInterval = new TimeSpan(hours, minutes, 0);
 

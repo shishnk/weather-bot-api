@@ -11,23 +11,30 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-    - name: Build
-      run: dotnet build
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Build
+        run: dotnet build
 
   tests:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Test WeatherApp
-      run: dotnet test ./WeatherBotApi.WeatherApp/Tests/WeatherApp.Tests/WeatherApp.Tests.csproj --verbosity normal
+      - name: Test WeatherApp
+        run: dotnet test ./WeatherBotApi.WeatherApp/Tests/WeatherApp.Tests/WeatherApp.Tests.csproj --verbosity normal /p:CollectCoverage=true /p:CoverletOutput=../../../TestResults/
 
-    - name: Test DatabaseApp
-      run: dotnet test ./WeatherBotApi.DatabaseApp/Tests/DatabaseApp.Tests/DatabaseApp.Tests.csproj --verbosity normal
+      - name: Test DatabaseApp
+        run: dotnet test ./WeatherBotApi.DatabaseApp/Tests/DatabaseApp.Tests/DatabaseApp.Tests.csproj --verbosity normal /p:CollectCoverage=true /p:CoverletOutput=../../../TestResults/ /p:MergeWith=../../../TestResults/coverage.json /p:CoverletOutputFormat=lcov
+
+      - name: Publish coverage report
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: './TestResults/coverage.info'
+          format: lcov

@@ -47,8 +47,6 @@ public sealed class PersistentConnection(
             {
                 HostName = messageSettings.HostName,
                 Port = messageSettings.Port,
-                UserName = messageSettings.Username,
-                Password = messageSettings.Password,
                 DispatchConsumersAsync = true
             };
         }

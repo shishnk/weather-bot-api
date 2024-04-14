@@ -16,6 +16,7 @@ builder.Services.AddHttpClient<IWeatherService, WeatherService>();
 builder.Services.AddControllers();
 builder.Services.AddSingleton(jsonSerializerOptions);
 builder.Services.AddMessaging(builder.Configuration);
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -32,6 +33,7 @@ if (app.Environment.IsDevelopment())
 
 app.SubscribeToEvents();
 app.UseHttpsRedirection();
+app.MapHealthChecks("/health");
 app.UseRouting();
 app.MapControllers();
 

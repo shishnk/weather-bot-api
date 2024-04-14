@@ -1,38 +1,63 @@
 version: '3.8'
 services:
   weatherapp:
-    image: weatherapp
     build:
       context: .
       dockerfile: WeatherBotApi.WeatherApp/Presentation/WeatherApp.WebApi/Properties/Dockerfile
     ports:
-      - "5555:8080"
+      - "5555:8079"
     depends_on:
       rabbitmq:
         condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8079
+      - RabbitMqSettings__HostName=rabbitmq
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8079/health || exit 1" ]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+    restart: on-failure
   telegrambot:
-    image: telegrambot
     build:
       context: .
       dockerfile: WeatherBotApi.TelegramBotApp/Presentation/TelegramBotApp.Api/Dockerfile
+    environment:
+      - RabbitMqSettings__HostName=rabbitmq
+      - TelegramSettings__BotToken=${TELEGRAM_BOT_TOKEN}
+      - ConnectionStrings__Redis=redis:6379
     depends_on:
       rabbitmq:
         condition: service_healthy
+      databaseapi:
+        condition: service_healthy
+      weatherapp:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
   databaseapi:
-    image: databaseapi
     build:
       context: .
       dockerfile: WeatherBotApi.DatabaseApp/Presentation/DatabaseApp.WebApi/Properties/Dockerfile
     ports:
-      - "5556:8080"
+      - "5556:8078"
     depends_on:
       database:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DbConnection=Host=database:5432;Database=weather-database;Username=user;Password=pass
+      - ASPNETCORE_URLS=http://+:8078
+      - ConnectionStrings__DbConnection=Host=database:5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ConnectionStrings__Redis=redis:6379
+      - RabbitMqSettings__HostName=rabbitmq
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8078/health || exit 1" ]
+      interval: 5s
+      timeout: 10s
+      retries: 3
   rabbitmq:
     image: rabbitmq:3.13.0-management
     healthcheck:
@@ -47,9 +72,9 @@ services:
     image: postgres:latest
     restart: always
     environment:
-      POSTGRES_DB: weather-database
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ~/data/postgres:/var/lib/postgresql/data/
     healthcheck:
@@ -60,7 +85,12 @@ services:
     ports:
       - "5755:5432"
   redis:
-    image: 'redis:latest'
+    image: redis:latest
     restart: always
     ports:
       - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 15s
+      timeout: 15s
+      retries: 3

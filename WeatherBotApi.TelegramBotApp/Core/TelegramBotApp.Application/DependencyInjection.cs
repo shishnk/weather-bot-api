@@ -11,9 +11,9 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<ITelegramBotSettings, TelegramBotSettings>();
+        // services.AddSingleton<ITelegramBotSettings, TelegramBotSettings>();
         services.AddSingleton<TelegramCommandValidatorFactory>();
-        services.AddSingleton<TelegramCommandFactory>();
+        // services.AddSingleton<TelegramCommandFactory>();
         services.AddSingleton<ITelegramBotInitializer, TelegramBotInitializer>();
         services.AddSingleton<IResendMessageService, ResendMessageService>();
 

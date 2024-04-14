@@ -1,12 +1,9 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Composition;
-using System.Globalization;
 using System.Text;
 using FluentResults;
-using Telegram.Bot.Types;
 using TelegramBotApp.Application.Factories;
-using TelegramBotApp.Application.Services;
 using TelegramBotApp.Caching.Caching;
 using TelegramBotApp.Domain.Models;
 using TelegramBotApp.Messaging;
@@ -66,9 +63,11 @@ public class WeatherTelegramCommand : ITelegramCommand
         IEventBus bus, ICacheService cacheService, IResendMessageService messageService,
         CancellationToken cancellationToken)
     {
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
         var city = context.ParseResult.GetValueForArgument(getArgument("city"));
         var response = await bus.Publish(new WeatherForecastRequestIntegrationEvent(city), nameof(UniversalResponse),
-            CancellationToken.None); // TODO: fix cancellation token
+            cts.Token); // TODO: fix cancellation token
 
         return !response.IsEmpty
             ? Result.Ok(response.Message)
@@ -78,11 +77,11 @@ public class WeatherTelegramCommand : ITelegramCommand
 
 [Export(typeof(ITelegramCommand))]
 [ExportMetadata(nameof(Command), "/createSubscription")]
-[ExportMetadata(nameof(Description), "<location> <resendInterval (example: 00:00:30)> - create a subscription")]
+[ExportMetadata(nameof(Description), "<location> <resendInterval (example: 00:30)> - create a subscription")]
 public class CreateSubscriptionTelegramCommand : ITelegramCommand
 {
     public string Command => "/createSubscription";
-    public string Description => "<location> <resendInterval (example: 00:00:30)> - create a subscription";
+    public string Description => "<location> <resendInterval (example: 00:30)> - create a subscription";
 
     public IEnumerable<Argument<string>> Arguments
     {
@@ -101,12 +100,24 @@ public class CreateSubscriptionTelegramCommand : ITelegramCommand
         CancellationToken cancellationToken)
     {
         var location = context.ParseResult.GetValueForArgument(getArgument("location"));
+        var intervalMemory = context.ParseResult.GetValueForArgument(getArgument("resendInterval")).AsMemory();
+        var colonIndex = intervalMemory.Span.IndexOf(':');
 
-        if (!TimeSpan.TryParseExact(context.ParseResult.GetValueForArgument(getArgument("resendInterval")),
-                @"hh\:mm\:ss", CultureInfo.InvariantCulture, out var resendInterval))
+        // TODO: avoid code duplication, using constants
+        if (colonIndex == -1)
         {
-            return "Invalid format for resend interval. Please use the format hh:mm:ss".ToResult();
+            return "Invalid format for resend interval. Please use the format hh:mm".ToResult();
         }
+
+        var hoursMemory = intervalMemory[..colonIndex];
+        var minutesMemory = intervalMemory[(colonIndex + 1)..];
+
+        if (!int.TryParse(hoursMemory.Span, out var hours) || !int.TryParse(minutesMemory.Span, out var minutes))
+        {
+            return "Invalid format for resend interval. Please use the format hh:mm".ToResult();
+        }
+
+        var resendInterval = new TimeSpan(hours, minutes, 0);
 
         if (resendInterval < TimeSpan.FromMinutes(30)) // hardcode
         {
@@ -152,12 +163,13 @@ public class GetUserWeatherSubscriptionsTelegramCommand : ITelegramCommand
         if (allSubscriptions == null) return Result.Fail("Bad internal state");
 
         var message = new StringBuilder();
+        var userSubscriptions = allSubscriptions.Where(s => s.TelegramId == telegramId).ToList();
 
-        for (var i = 0; i < allSubscriptions.Count; i++)
+        for (var i = 0; i < userSubscriptions.Count; i++)
         {
-            var subscription = allSubscriptions[i];
+            var subscription = userSubscriptions[i];
             message.AppendLine(
-                $"{i + 1}) Location: {subscription.Location}, resend interval: {subscription.ResendInterval}");
+                $"{i + 1}) Location: {subscription.Location}, resend interval: {subscription.ResendInterval.ToString(@"hh\:mm")}");
         }
 
         return message.Length > 0
@@ -168,11 +180,11 @@ public class GetUserWeatherSubscriptionsTelegramCommand : ITelegramCommand
 
 [Export(typeof(ITelegramCommand))]
 [ExportMetadata(nameof(Command), "/updateSubscription")]
-[ExportMetadata(nameof(Description), "<location> <resendInterval (example: 00:00:30)> - update a subscription")]
+[ExportMetadata(nameof(Description), "<location> <resendInterval (example: 00:30)> - update a subscription")]
 public class UpdateSubscriptionTelegramCommand : ITelegramCommand
 {
     public string Command => "/updateSubscription";
-    public string Description => "<location> <resendInterval (example: 00:00:30)> - update a subscription";
+    public string Description => "<location> <resendInterval (example: 00:30)> - update a subscription";
 
     public IEnumerable<Argument<string>> Arguments
     {
@@ -190,12 +202,24 @@ public class UpdateSubscriptionTelegramCommand : ITelegramCommand
         CancellationToken cancellationToken)
     {
         var location = context.ParseResult.GetValueForArgument(getArgument("location"));
+        var intervalMemory = context.ParseResult.GetValueForArgument(getArgument("resendInterval")).AsMemory();
+        var colonIndex = intervalMemory.Span.IndexOf(':');
 
-        if (!TimeSpan.TryParseExact(context.ParseResult.GetValueForArgument(getArgument("resendInterval")),
-                @"hh\:mm\:ss", CultureInfo.InvariantCulture, out var resendInterval))
+        // TODO: avoid code duplication, using constants
+        if (colonIndex == -1)
         {
-            return "Invalid format for resend interval. Please use the format hh:mm:ss".ToResult();
+            return "Invalid format for resend interval. Please use the format hh:mm".ToResult();
         }
+
+        var hoursMemory = intervalMemory[..colonIndex];
+        var minutesMemory = intervalMemory[(colonIndex + 1)..];
+
+        if (!int.TryParse(hoursMemory.Span, out var hours) || !int.TryParse(minutesMemory.Span, out var minutes))
+        {
+            return "Invalid format for resend interval. Please use the format hh:mm".ToResult();
+        }
+
+        var resendInterval = new TimeSpan(hours, minutes, 0);
 
         if (resendInterval < TimeSpan.FromMinutes(30)) // hardcode
         {

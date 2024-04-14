@@ -14,8 +14,19 @@ public class WeatherForecastRequestIntegrationEventHandler(IWeatherService weath
 
     public async Task<IResponseMessage> Handle(WeatherForecastRequestIntegrationEvent @event)
     {
-        var weatherDescriptor = await weatherService.GetWeatherForecastAsync(@event.Location);
-        weatherDescriptor.SetLocation(@event.Location);
-        return new UniversalResponse(_messageFormatter.Format(weatherDescriptor));
+        try
+        {
+            var weatherDescriptor = await weatherService.GetWeatherForecastAsync(@event.Location);
+            weatherDescriptor.SetLocation(@event.Location);
+            return new UniversalResponse(_messageFormatter.Format(weatherDescriptor));
+        }
+        catch (HttpRequestException)
+        {
+            return new UniversalResponse($"Failed to get the weather forecast. Bad location '{@event.Location}' or network issues.");
+        }
+        catch (Exception e)
+        {
+            return new UniversalResponse(e.Message);
+        }
     }
 }

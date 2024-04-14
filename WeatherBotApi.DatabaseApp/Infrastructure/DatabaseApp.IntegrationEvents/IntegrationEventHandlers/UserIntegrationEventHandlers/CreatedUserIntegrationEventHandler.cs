@@ -17,7 +17,7 @@ public class CreatedUserIntegrationEventHandler(IServiceScopeFactory factory, IC
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         var result = await mediator.Send(new CreateUserCommand
         {
-            TelegramId = @event.UserTelegramId, // TODO
+            TelegramId = @event.UserTelegramId,
             Username = @event.Username,
             MobileNumber = @event.MobileNumber,
             RegisteredAt = @event.RegisteredAt

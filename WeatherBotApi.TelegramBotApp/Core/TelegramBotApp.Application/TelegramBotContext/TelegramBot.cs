@@ -51,7 +51,7 @@ public class TelegramBot(ITelegramBotClient telegramBot, ReceiverOptions receive
 
             try
             {
-                await UpdateUsersCacheAsync(message, bus, cts.Token);
+                _ = UpdateUsersCacheAsync(message, bus, cts.Token);
                 var result = await _telegramCommandFactory.StartCommand(messageText, chatId);
 
                 if (result.IsFailed)

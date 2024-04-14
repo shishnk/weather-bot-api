@@ -47,6 +47,8 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8078
@@ -57,7 +59,8 @@ services:
       test: [ "CMD-SHELL", "curl -f http://localhost:8078/health || exit 1" ]
       interval: 5s
       timeout: 10s
-      retries: 3
+      retries: 5
+    restart: on-failure
   rabbitmq:
     image: rabbitmq:3.13.0-management
     healthcheck:
@@ -79,9 +82,9 @@ services:
       - ~/data/postgres:/var/lib/postgresql/data/
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
-      interval: 1s
-      timeout: 5s
-      retries: 3
+      interval: 5s
+      timeout: 10s
+      retries: 5
     ports:
       - "5755:5432"
   redis:

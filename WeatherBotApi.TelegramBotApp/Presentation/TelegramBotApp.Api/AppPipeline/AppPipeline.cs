@@ -20,7 +20,8 @@ public class AppPipeline : IPipeline
         {
             using var host = Host.CreateDefaultBuilder()
                 .ConfigureAppConfiguration(config =>
-                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true))
+                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                        .AddEnvironmentVariables())
                 .ConfigureServices((builder, services) => services
                     .AddApplication(builder.Configuration)
                     .AddMessaging(builder.Configuration)
@@ -47,7 +48,12 @@ public class AppPipeline : IPipeline
             var me = await botClient.GetMeAsync();
 
             Console.WriteLine($"Start listening for @{me.Username}");
-            Console.ReadLine();
+
+            // strange loop for simulation ReadLine, TODO: fix
+            while (!cancellationTokenSource.IsCancellationRequested)
+            {
+                await Task.Delay(TimeSpan.FromMinutes(1), cancellationTokenSource.Token);
+            }
 
             await cancellationTokenSource.CancelAsync();
         }

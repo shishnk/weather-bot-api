@@ -4,6 +4,7 @@ using DatabaseApp.IntegrationEvents;
 using DatabaseApp.Persistence;
 using DatabaseApp.Persistence.DatabaseContext;
 using DatabaseApp.WebApi.Middleware;
+using HealthChecks.UI.Client;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Any;
 using Serilog;
@@ -63,6 +64,10 @@ if (app.Environment.IsDevelopment())
 
 app.SubscribeToEvents();
 app.UseHttpsRedirection();
+app.MapHealthChecks("/health", new()
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 app.UseExceptionHandler();
 app.UseSerilogRequestLogging();
 app.UseRouting();

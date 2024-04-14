@@ -9,6 +9,6 @@ public class TelegramBotSettings : ITelegramBotSettings
     public CancellationToken Token => _cts.Token;
 
     private TelegramBotSettings() => _cts = new(Timeout);
-
+    
     public static ITelegramBotSettings CreateDefault() => new TelegramBotSettings();
 }

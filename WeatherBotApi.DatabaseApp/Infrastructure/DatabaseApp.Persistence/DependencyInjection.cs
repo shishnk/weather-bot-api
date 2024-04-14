@@ -23,6 +23,9 @@ public static class DependencyInjection
         services.AddScoped<IWeatherSubscriptionRepository, WeatherSubscriptionRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+        services.AddHealthChecks()
+            .AddNpgSql(connectionString ?? throw new InvalidOperationException("DbConnection string is null"));
+
         return services;
     }
 }

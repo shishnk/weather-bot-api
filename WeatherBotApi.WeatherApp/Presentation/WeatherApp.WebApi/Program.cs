@@ -1,8 +1,8 @@
 using System.Text.Json;
 using Converters.JsonConverters;
 using TelegramBotApp.Messaging;
-using WeatherApp.Application.Services;
 using WeatherApp.IntegrationEvents;
+using WeatherApp.WeatherStation.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var jsonSerializerOptions = new JsonSerializerOptions

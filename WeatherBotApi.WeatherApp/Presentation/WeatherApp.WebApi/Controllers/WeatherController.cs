@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WeatherApp.Application.Services;
+using WeatherApp.WeatherStation.Services;
 
 namespace WeatherApp.WebApi.Controllers;
 

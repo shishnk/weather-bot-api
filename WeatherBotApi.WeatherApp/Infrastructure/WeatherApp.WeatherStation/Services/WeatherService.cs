@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using WeatherApp.Domain.Models;
 
-namespace WeatherApp.Application.Services;
+namespace WeatherApp.WeatherStation.Services;
 
 public class WeatherService(HttpClient httpClient, JsonSerializerOptions options) : IWeatherService
 {

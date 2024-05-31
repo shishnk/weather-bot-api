@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using Converters.JsonConverters;
 using Microsoft.Extensions.DependencyInjection;
-using WeatherApp.Application.Services;
+using WeatherApp.WeatherStation.Services;
 
 namespace WeatherApp.Tests.ServiceFixtures;
 

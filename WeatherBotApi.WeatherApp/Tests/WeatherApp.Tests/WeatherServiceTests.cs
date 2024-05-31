@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using WeatherApp.Application.Services;
 using WeatherApp.Tests.ServiceFixtures;
+using WeatherApp.WeatherStation.Services;
 using WeatherApp.WebApi.Controllers;
 using Xunit;
 

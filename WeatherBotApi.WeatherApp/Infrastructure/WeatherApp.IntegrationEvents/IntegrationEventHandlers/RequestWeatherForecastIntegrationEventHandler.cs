@@ -2,7 +2,7 @@ using TelegramBotApp.Messaging.IntegrationContext;
 using TelegramBotApp.Messaging.IntegrationContext.WeatherForecastIntegrationEvents;
 using TelegramBotApp.Messaging.IntegrationResponseContext.IntegrationResponses;
 using WeatherApp.Application.MessageFormatters;
-using WeatherApp.Application.Services;
+using WeatherApp.WeatherStation.Services;
 
 namespace WeatherApp.IntegrationEvents.IntegrationEventHandlers;
 

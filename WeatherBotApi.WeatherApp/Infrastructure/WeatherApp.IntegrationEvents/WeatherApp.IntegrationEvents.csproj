@@ -13,6 +13,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\..\WeatherBotApi.TelegramBotApp\Infrastructure\TelegramBotApp.Messaging\TelegramBotApp.Messaging.csproj" />
       <ProjectReference Include="..\..\Core\WeatherApp.Application\WeatherApp.Application.csproj" />
+      <ProjectReference Include="..\WeatherApp.Converters\WeatherApp.Converters.csproj" />
       <ProjectReference Include="..\WeatherApp.WeatherStation\WeatherApp.WeatherStation.csproj" />
     </ItemGroup>
 

@@ -1,9 +1,8 @@
 using TelegramBotApp.Messaging;
 using WeatherApp.Domain.Models;
 
-namespace WeatherApp.Application.MessageFormatters;
+namespace Converters.MessageFormatters;
 
-// TODO: move to infrastructure
 public class WeatherDescriptorFormatter : IMessageFormatter<WeatherDescriptor>
 {
     public string Format(WeatherDescriptor value) =>

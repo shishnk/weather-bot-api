@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\WeatherBotApi.TelegramBotApp\Infrastructure\TelegramBotApp.Messaging\TelegramBotApp.Messaging.csproj" />
     <ProjectReference Include="..\..\Core\WeatherApp.Domain\WeatherApp.Domain.csproj" />
   </ItemGroup>
 

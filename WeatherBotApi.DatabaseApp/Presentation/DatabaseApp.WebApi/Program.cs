@@ -2,10 +2,9 @@ using System.Reflection;
 using DatabaseApp.Application;
 using DatabaseApp.IntegrationEvents;
 using DatabaseApp.Persistence;
-using DatabaseApp.Persistence.DatabaseContext;
+using DatabaseApp.WebApi.Common.Extensions;
 using DatabaseApp.WebApi.Middleware;
 using HealthChecks.UI.Client;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Any;
 using Serilog;
 using TelegramBotApp.Caching;
@@ -40,16 +39,7 @@ builder.Services
 
 var app = builder.Build();
 
-try
-{
-    using var scope = app.Services.CreateScope();
-    var databaseContext = scope.ServiceProvider.GetRequiredService<IDatabaseContext>();
-    databaseContext.Db.Migrate();
-}
-catch (Exception e)
-{
-    Log.Fatal(e, "An error occurred while migrating the database.");
-}
+app.MigrateDatabase();
 
 if (app.Environment.IsDevelopment())
 {
